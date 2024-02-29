@@ -7,16 +7,15 @@ import { initializeApp } from "firebase/app";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDvhd3nKKeWixfDPNtVqbvEmrolaR11rKY",
-  authDomain: "sales-tracker-248a2.firebaseapp.com",
-  projectId: "sales-tracker-248a2",
-  storageBucket: "sales-tracker-248a2.appspot.com",
-  messagingSenderId: "673388427816",
-  appId: "1:673388427816:web:6d07965d086f67b84ed31d",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_IT,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 // Initialize Firebase
 const firebaseApp = initializeApp(firebaseConfig);
-
 export default firebaseApp
 
