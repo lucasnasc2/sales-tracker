@@ -24,6 +24,7 @@
   <v-main class="custom-main">
     <SellerMode v-if="mode == 'seller'" />
     <ManageMode v-if="mode == 'manage'" />
+    <ReportsMode v-if="mode == 'reports'" />
   </v-main>
 </template>
 

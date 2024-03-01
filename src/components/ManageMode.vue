@@ -1,20 +1,30 @@
 <template>
   <v-container>
     <!-- Chips for filtering -->
-    <v-row>
-      <v-chip
-        v-for="(category, index) in categoryOptions"
-        :key="index"
-        @click="toggleFilterByCategory(category)"
-        :class="{ active: filteredCategories.includes(category) }"
-      >
-        {{ category }}
-      </v-chip>
-    </v-row>
+    <div class="px-2">
+      <v-chip-group column>
+        <v-chip
+          filter
+          class="mx-1"
+          v-for="(category, index) in categoryOptions"
+          :key="index"
+          @click="toggleFilterByCategory(category)"
+        >
+          {{ category }}
+        </v-chip>
+      </v-chip-group>
+    </div>
 
     <!-- Grid of square cards -->
     <v-row>
-      <v-col v-for="(item, index) in filteredItems" :key="index" cols="3">
+      <v-col
+        v-for="(item, index) in filteredItems"
+        :key="index"
+        :sm="6"
+        :md="4"
+        :lg="3"
+        :xl="2"
+      >
         <v-card @click="editItem(item)">
           <v-card-title>{{ item.name }}</v-card-title>
           <v-card-subtitle>{{ item.category }}</v-card-subtitle>
@@ -26,17 +36,38 @@
     <!-- Popup dialog -->
     <v-dialog v-model="dialog" max-width="500">
       <v-card>
-        <v-card-title>{{ isEditing ? 'Edit Item' : 'Add Product' }}</v-card-title>
+        <v-card-title>{{
+          isEditing ? "Edit Item" : "Add Product"
+        }}</v-card-title>
         <v-card-text>
           <v-form ref="form">
-            <v-text-field v-model="editedItem.name" label="Name" @input="checkFieldsFilled"></v-text-field>
-            <v-text-field v-model="editedItem.category" label="Category" @input="checkFieldsFilled"></v-text-field>
-            <v-text-field v-model="editedItem.price" label="Price" @input="checkFieldsFilled"></v-text-field>
+            <v-text-field
+              v-model="editedItem.name"
+              label="Name"
+              @input="checkFieldsFilled"
+            ></v-text-field>
+            <v-text-field
+              v-model="editedItem.category"
+              label="Category"
+              @input="checkFieldsFilled"
+            ></v-text-field>
+            <v-text-field
+              v-model="editedItem.price"
+              label="Price"
+              @input="checkFieldsFilled"
+            ></v-text-field>
           </v-form>
         </v-card-text>
         <v-card-actions>
-          <v-btn v-if="isEditing" color="error" @click="confirmDelete">Delete</v-btn>
-          <v-btn color="primary" @click="saveChanges" :disabled="!checkFieldsFilled()">{{ isEditing ? 'Save' : 'Add' }}</v-btn>
+          <v-btn v-if="isEditing" color="error" @click="confirmDelete"
+            >Delete</v-btn
+          >
+          <v-btn
+            color="primary"
+            @click="saveChanges"
+            :disabled="!checkFieldsFilled()"
+            >{{ isEditing ? "Save" : "Add" }}</v-btn
+          >
           <v-btn color="error" @click="dialog = false">Cancel</v-btn>
         </v-card-actions>
       </v-card>
@@ -50,47 +81,63 @@
 </template>
 
 <script>
+import { mapStores } from "pinia";
+import { useProductStore } from "@/store/products.js";
+
 export default {
   data() {
     return {
-      items: [
-        { name: "Item 1", category: "Category A", price: "$10" },
-        { name: "Item 2", category: "Category B", price: "$20" },
-        // Add more items as needed
-      ],
+      items: [],
       filteredItems: [],
-      filteredCategories: [],
-      editedItem: { name: '', category: '', price: '' },
+      filteredCategory: "",
+      editedItem: {
+        name: "",
+        description: "",
+        stock: 1,
+        active: true,
+        img: "",
+        category: "",
+        price: 0,
+      },
       dialog: false,
       isEditing: false, // Added to track if editing or adding new product
     };
   },
   computed: {
+    ...mapStores(useProductStore),
     categoryOptions() {
-      return [...new Set(this.items.map(item => item.category))];
-    }
+      return [...new Set(this.items.map((item) => item.category))];
+    },
   },
   mounted() {
+    this.productStore.fetchProducts();
     this.filteredItems = this.items;
+  },
+  watch: {
+    "productStore.products": {
+      handler(newValue, oldValue) {
+        this.items.splice(0, this.items.length, ...newValue);
+        this.filterItems();
+      },
+      immediate: true, // Immediately trigger the handler with the current value
+    },
   },
   methods: {
     toggleFilterByCategory(category) {
-      const index = this.filteredCategories.indexOf(category);
-      if (index === -1) {
-        this.filteredCategories.push(category);
-      } else {
-        this.filteredCategories.splice(index, 1);
+      if (
+        !this.filteredCategory ||
+        (!!this.filteredCategory && this.filteredCategory != category)
+      ) {
+        this.filteredCategory = category;
+      } else if (this.filteredCategory == category) {
+        this.filteredCategory = "";
       }
       this.filterItems();
     },
     filterItems() {
-      if (this.filteredCategories.length === 0) {
-        this.filteredItems = this.items;
-      } else {
-        this.filteredItems = this.items.filter((item) =>
-          this.filteredCategories.includes(item.category)
-        );
-      }
+      this.filteredItems = this.items.filter((item) =>
+        !!this.filteredCategory ? this.filteredCategory == item.category : true
+      );
     },
     editItem(item) {
       this.editedItem = { ...item };
@@ -98,22 +145,24 @@ export default {
       this.isEditing = true;
     },
     addProduct() {
-      this.editedItem = { name: '', category: '', price: '' };
+      this.editedItem = {
+        name: "",
+        description: "",
+        stock: 1,
+        active: true,
+        img: "",
+        category: "",
+        price: 0,
+      };
       this.dialog = true;
       this.isEditing = false;
     },
     saveChanges() {
       if (this.isEditing) {
         // Implement your logic to save changes for editing
-        const index = this.items.findIndex(
-          (item) => item.name === this.editedItem.name
-        );
-        if (index !== -1) {
-          this.items[index] = { ...this.editedItem };
-        }
+        this.productStore.updateFirestore(this.editedItem);
       } else {
-        // Implement your logic to save new product
-        this.items.push({ ...this.editedItem });
+        this.productStore.addToFirestore(this.editedItem);
       }
       this.dialog = false;
     },
@@ -123,17 +172,15 @@ export default {
       }
     },
     deleteItemConfirmed() {
-      const index = this.items.findIndex(
-        (item) => item.name === this.editedItem.name
-      );
-      if (index !== -1) {
-        this.items.splice(index, 1);
-        this.filterItems();
-      }
+      this.productStore.deleteFirestore(this.editedItem);
       this.dialog = false;
     },
     checkFieldsFilled() {
-      return this.editedItem.name && this.editedItem.category && this.editedItem.price;
+      return (
+        this.editedItem.name &&
+        this.editedItem.category &&
+        this.editedItem.price
+      );
     },
   },
 };

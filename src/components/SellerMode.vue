@@ -3,10 +3,11 @@
     <!-- Chips for filtering -->
     <v-row>
       <v-chip
-        v-for="(category, index) in uniqueCategories"
+        class="mx-1"
+        v-for="(category, index) in categoryOptions"
         :key="index"
-        @click="toggleFilter(category)"
-        :color="isFiltered(category) ? 'primary' : ''"
+        @click="toggleFilterByCategory(category)"
+        :class="{ active: filteredCategories.includes(category) }"
       >
         {{ category }}
       </v-chip>
@@ -14,7 +15,14 @@
 
     <!-- Grid of square cards -->
     <v-row>
-      <v-col v-for="(item, index) in filteredItems" :key="index" cols="3">
+      <v-col
+        v-for="(item, index) in filteredItems"
+        :key="index"
+        :sm="6"
+        :md="4"
+        :lg="3"
+        :xl="2"
+      >
         <v-card @click="showDetails(item)">
           <v-card-title>{{ item.name }}</v-card-title>
           <v-card-subtitle>{{ item.category }}</v-card-subtitle>
@@ -100,14 +108,13 @@
 </template>
 
 <script>
+import { mapStores } from "pinia";
+import { useProductStore } from "@/store/products.js";
+import { useSalesStore } from "@/store/sales.js";
 export default {
   data() {
     return {
-      items: [
-        { name: "Item 1", category: "Category A", price: "$10" },
-        { name: "Item 2", category: "Category B", price: "$20" },
-        // Add more items as needed
-      ],
+      items: [],
       filteredCategories: [],
       filteredItems: [],
       selectedItem: {},
@@ -118,31 +125,43 @@ export default {
     };
   },
   computed: {
-    uniqueCategories() {
+    ...mapStores(useProductStore, useSalesStore),
+    categoryOptions() {
       return [...new Set(this.items.map((item) => item.category))];
     },
     totalQuantityInCart() {
       return this.cart.reduce((total, item) => total + item.quantity, 0);
     },
+    checkoutPrice() {
+      return this.cart.reduce((total, item) => {
+        return total + item.price * item.quantity;
+      }, 0);
+    },
   },
   mounted() {
+    this.productStore.fetchProducts();
     this.filteredItems = this.items;
   },
+  watch: {
+    "productStore.products": {
+      handler(newValue, oldValue) {
+        this.items.splice(0, this.items.length, ...newValue);
+        this.filterItems();
+      },
+      immediate: true, // Immediately trigger the handler with the current value
+    },
+  },
   methods: {
-    isFiltered(category) {
-      return this.filteredCategories.includes(category);
-    },
-    toggleFilter(category) {
-      if (this.isFiltered(category)) {
-        this.filteredCategories = this.filteredCategories.filter(
-          (cat) => cat !== category
-        );
-      } else {
+    toggleFilterByCategory(category) {
+      const index = this.filteredCategories.indexOf(category);
+      if (index === -1) {
         this.filteredCategories.push(category);
+      } else {
+        this.filteredCategories.splice(index, 1);
       }
-      this.applyFilters();
+      this.filterItems();
     },
-    applyFilters() {
+    filterItems() {
       if (this.filteredCategories.length === 0) {
         this.filteredItems = this.items;
       } else {
@@ -156,13 +175,18 @@ export default {
       this.dialog = true;
     },
     addItemToCart(item) {
-      const index = this.cart.findIndex(
-        (cartItem) => cartItem.name === item.name
-      );
+      console.log(item);
+      const index = this.cart.findIndex((cartItem) => cartItem.id === item.id);
+      console.log(index);
       if (index !== -1) {
         this.cart[index].quantity += this.quantity;
       } else {
-        this.cart.push({ ...item, quantity: this.quantity });
+        this.cart.push({
+          id: item.id,
+          category: item.category,
+          price: item.price,
+          quantity: this.quantity,
+        });
       }
       this.quantity = 1; // Reset quantity after adding to cart
       this.dialog = false; // Close product detail dialog after adding to cart
@@ -174,13 +198,18 @@ export default {
     },
     removeItemFromCart(index) {
       this.cart.splice(index, 1);
-      if(this.cart.length == 0) this.toggleCartDialog();
+      if (this.cart.length == 0) this.toggleCartDialog();
     },
     toggleCartDialog() {
       this.cartDialog = !this.cartDialog;
     },
     checkout() {
-      // Implement checkout logic here
+      let saleObject = {
+        items: [...this.cart],
+        checkoutPrice: this.checkoutPrice,
+      };
+      this.salesStore.addToFirestore(saleObject);
+      this.clearCart();
     },
     clearCart() {
       this.cart = [];

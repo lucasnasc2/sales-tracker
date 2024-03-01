@@ -15,6 +15,7 @@ import Login from "./views/Login.vue";
 import { createApp } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
 import { createPinia } from "pinia";
+import { useUserStore } from "./store/user.js";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import firebaseApp from "./firebase.js";
 
@@ -32,11 +33,15 @@ const pinia = createPinia();
 const app = createApp(App);
 registerPlugins(app);
 
-app.use(router, pinia).mount("#app");
+app.use(router);
+app.use(pinia);
+app.mount("#app");
+const userStore = useUserStore();
 let isLoggedIn = false;
 const auth = getAuth(firebaseApp);
 onAuthStateChanged(auth, (user) => {
   isLoggedIn = !!user;
+  userStore.user = user
 });
 
 router.beforeEach(async (to, from, next) => {
