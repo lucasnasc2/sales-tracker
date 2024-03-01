@@ -7,7 +7,7 @@
           <v-card-text>
             <v-list lines="two">
               <v-list-subheader inset>Ventas</v-list-subheader>
-              <v-list-item v-for="sale in sales" :key="sale.id" :subtitle="sale.checkoutPrice" :title="sale.checkoutTime">
+              <v-list-item v-for="sale in sales" :key="sale.id" :title="sale.checkoutTime">
                 <template v-slot:prepend>
                   <v-avatar color="grey-lighten-1">
                     <v-icon color="white">mdi-receipt-text</v-icon>
@@ -15,6 +15,7 @@
                 </template>
 
                 <template v-slot:append>
+                  ${{ sale.checkoutPrice }}
                   <v-btn @click="selectSale(sale)" color="grey-lighten-1" icon="mdi-information" variant="text"></v-btn>
                 </template>
               </v-list-item>
