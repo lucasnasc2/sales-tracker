@@ -3,13 +3,8 @@
     <!-- Chips for filtering -->
     <div class="px-2">
       <v-chip-group column>
-        <v-chip
-          filter
-          class="mx-1"
-          v-for="(category, index) in categoryOptions"
-          :key="index"
-          @click="toggleFilterByCategory(category)"
-        >
+        <v-chip filter class="mx-1" v-for="(category, index) in categoryOptions" :key="index"
+          @click="toggleFilterByCategory(category)">
           {{ category }}
         </v-chip>
       </v-chip-group>
@@ -17,14 +12,7 @@
 
     <!-- Grid of square cards -->
     <v-row>
-      <v-col
-        v-for="(item, index) in filteredItems"
-        :key="index"
-        :sm="6"
-        :md="4"
-        :lg="3"
-        :xl="2"
-      >
+      <v-col v-for="(item, index) in filteredItems" :key="index" :sm="6" :md="4" :lg="3" :xl="2">
         <v-card @click="editItem(item)">
           <v-card-title>{{ item.name }}</v-card-title>
           <v-card-subtitle>{{ item.category }}</v-card-subtitle>
@@ -41,33 +29,15 @@
         }}</v-card-title>
         <v-card-text>
           <v-form ref="form">
-            <v-text-field
-              v-model="editedItem.name"
-              label="Name"
-              @input="checkFieldsFilled"
-            ></v-text-field>
-            <v-text-field
-              v-model="editedItem.category"
-              label="Category"
-              @input="checkFieldsFilled"
-            ></v-text-field>
-            <v-text-field
-              v-model="editedItem.price"
-              label="Price"
-              @input="checkFieldsFilled"
-            ></v-text-field>
+            <v-text-field v-model="editedItem.name" label="Name" @input="checkFieldsFilled"></v-text-field>
+            <v-text-field v-model="editedItem.category" label="Category" @input="checkFieldsFilled"></v-text-field>
+            <v-text-field v-model="editedItem.price" label="Price" @input="checkFieldsFilled"></v-text-field>
           </v-form>
         </v-card-text>
         <v-card-actions>
-          <v-btn v-if="isEditing" color="error" @click="confirmDelete"
-            >Delete</v-btn
-          >
-          <v-btn
-            color="primary"
-            @click="saveChanges"
-            :disabled="!checkFieldsFilled()"
-            >{{ isEditing ? "Save" : "Add" }}</v-btn
-          >
+          <v-btn v-if="isEditing" color="error" @click="confirmDelete">Delete</v-btn>
+          <v-btn color="primary" @click="saveChanges" :disabled="!checkFieldsFilled()">{{ isEditing ? "Save" : "Add"
+          }}</v-btn>
           <v-btn color="error" @click="dialog = false">Cancel</v-btn>
         </v-card-actions>
       </v-card>
@@ -75,8 +45,8 @@
   </v-container>
 
   <!-- Add Product button (floating) -->
-  <div class="add-product-container">
-    <v-btn color="primary" @click="addProduct">Add Product</v-btn>
+  <div style="position: fixed; bottom: 20px; right: 20px">
+    <v-btn icon size="x-large" color="primary" @click="addProduct">Add Product</v-btn>
   </div>
 </template>
 
@@ -187,13 +157,4 @@ export default {
 </script>
 
 <style>
-.active {
-  background-color: #1976d2;
-  color: white;
-}
-.add-product-container {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-}
 </style>

@@ -1,18 +1,72 @@
 <template>
+  <v-container fluid class="fill-height">
+    <v-row align="center" justify="center" class="fill-height">
+      <v-col cols="12">
+        <v-card>
+          <v-card-title>Informe de hoy</v-card-title>
+          <v-card-text>
+            <v-list lines="two">
+              <v-list-subheader inset>Ventas</v-list-subheader>
+              <v-list-item v-for="sale in sales" :key="sale.id" :subtitle="sale.checkoutPrice" :title="sale.checkoutTime">
+                <template v-slot:prepend>
+                  <v-avatar color="grey-lighten-1">
+                    <v-icon color="white">mdi-receipt-text</v-icon>
+                  </v-avatar>
+                </template>
+
+                <template v-slot:append>
+                  <v-btn @click="selectSale(sale)" color="grey-lighten-1" icon="mdi-information" variant="text"></v-btn>
+                </template>
+              </v-list-item>
+            </v-list>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+
+  <v-dialog v-model="dialog" max-width="500px">
+    <v-card>
+      <v-card-title>Venta {{ selectedSale.id }}</v-card-title>
+      <v-card-subtitle>{{ selectedSale.checkoutTime }}</v-card-subtitle>
+      <v-card-text class="px-0">
+        <div class="d-flex py-0 justify-space-between">
+          <v-list-item density="compact">
+            <v-list-item-title>Subtotal</v-list-item-title>
+          </v-list-item>
+
+          <v-list-item density="compact">
+            <v-list-item-title>${{ selectedSale.checkoutPrice }}</v-list-item-title>
+          </v-list-item>
+        </div>
+        <v-divider></v-divider>
+        <v-list lines="two">
+          <v-list-subheader>Productos</v-list-subheader>
+
+          <v-list-item v-for="item in selectedSale.items" :key="item.id" :subtitle="'x' + item.quantity" :title="item.id">
+            <template v-slot:prepend>
+
+            </template>
+
+            <template v-slot:append>
+              ${{ item.price }}
+            </template>
+          </v-list-item>
+        </v-list>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+
   <v-dialog v-model="showDatePicker" max-width="500px">
     <v-container>
       <v-row justify="space-around">
-        <v-date-picker
-          @update:model-value="chengeDate"
-          show-adjacent-months
-        ></v-date-picker>
+        <v-date-picker @update:model-value="chengeDate" show-adjacent-months></v-date-picker>
       </v-row>
     </v-container>
   </v-dialog>
-  <div class="cart-container">
-    <v-btn color="primary" @click="showDatePicker = true">
-      <v-icon>mdi-calendar</v-icon>
-    </v-btn>
+
+  <div style="position: fixed; bottom: 20px; right: 20px">
+    <v-btn icon="mdi-calendar" size="x-large" color="primary" @click="showDatePicker = true"></v-btn>
   </div>
 </template>
 
@@ -29,6 +83,14 @@ export default {
   data() {
     return {
       selectedDate: todaysDate, // Initialize with current date
+      selectedSale: {
+        checkoutPrice: 0,
+        userId: '',
+        checkoutTime: '',
+        id: '',
+        items: []
+      },
+      dialog: false,
       filteredSales: [],
       sales: [],
       salesReport: [],
@@ -60,6 +122,9 @@ export default {
       }
       return total;
     },
+    saleIsSelected() {
+      return !!selectedSale
+    }
   },
   watch: {
     selectedDate: {
@@ -93,6 +158,10 @@ export default {
     this.salesStore.fetchSales(todaysDate, tomorrow);
   },
   methods: {
+    selectSale(sale) {
+      this.selectedSale = { ...sale }
+      this.dialog = true
+    },
     chengeDate(v) {
       console.log("1", v);
       this.selectedDate = v;
