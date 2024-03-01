@@ -11,15 +11,25 @@
     </div>
 
     <!-- Grid of square cards -->
-    <v-row>
-      <v-col v-for="(item, index) in filteredItems" :key="index" :sm="6" :md="4" :lg="3" :xl="2">
-        <v-card @click="editItem(item)">
-          <v-card-title>{{ item.name }}</v-card-title>
-          <v-card-subtitle>{{ item.category }}</v-card-subtitle>
-          <v-card-text>{{ item.price }}</v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
+    <v-container>
+      <v-row class="pa-1">
+        <v-col class="pa-2" v-for="(item, index) in filteredItems" :key="index" cols="6" :sm="3" :md="2">
+          <v-card @click="editItem(item)">
+            <v-card-item class="px-3 py-2">
+              <div>
+                <div class="text-caption mb-1">
+                  {{ item.category }}
+                </div>
+                <div class="text-h7 mb-1">
+                  {{ item.name }}
+                </div>
+                <div class="text-caption text-end">${{ item.price }}</div>
+              </div>
+            </v-card-item>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
 
     <!-- Popup dialog -->
     <v-dialog v-model="dialog" max-width="500">

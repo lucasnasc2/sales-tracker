@@ -11,37 +11,64 @@
     </div>
 
     <!-- Grid of square cards -->
-    <v-row>
-      <v-col v-for="(item, index) in filteredItems" :key="index" :sm="6" :md="4" :lg="3" :xl="2">
-        <v-card @click="showDetails(item)">
-          <v-card-title>{{ item.name }}</v-card-title>
-          <v-card-subtitle>{{ item.category }}</v-card-subtitle>
-          <v-card-text>{{ item.price }}</v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
+    <v-container>
+      <v-row class="pa-1">
+        <v-col class="pa-2" v-for="(item, index) in filteredItems" :key="index" cols="6" :sm="3" :md="2">
+          <v-card @click="showDetails(item)">
+            <v-card-item class="px-3 py-2">
+              <div>
+                <div class="text-caption mb-1">
+                  {{ item.category }}
+                </div>
+                <div class="text-h7 mb-1">
+                  {{ item.name }}
+                </div>
+                <div class="text-caption text-end">${{ item.price }}</div>
+              </div>
+            </v-card-item>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
 
+
+    
     <!-- Popup dialog for product details -->
     <v-dialog v-model="dialog" max-width="500">
       <v-card>
-        <v-card-title>{{ selectedItem.name }}</v-card-title>
-        <v-card-subtitle>{{ selectedItem.category }}</v-card-subtitle>
-        <v-card-text>{{ selectedItem.price }}</v-card-text>
-        <v-row align="center">
-          <v-col cols="3">Quantity:</v-col>
-          <v-col cols="9">
-            <v-btn icon @click="decrementQuantity">
-              <v-icon>mdi-minus</v-icon>
-            </v-btn>
-            {{ quantity }}
-            <v-btn icon @click="incrementQuantity">
-              <v-icon>mdi-plus</v-icon>
-            </v-btn>
-          </v-col>
-        </v-row>
+        <v-list lines="two">
+          <v-list-item :subtitle="selectedItem.category" :title="selectedItem.name">
+            <template v-slot:append>
+              ${{ selectedItem.price }}
+            </template>
+          </v-list-item>
+        </v-list>
         <v-card-actions>
-          <v-btn color="primary" @click="addItemToCart(selectedItem)">Add to Cart</v-btn>
+          <v-spacer></v-spacer>
+          <v-row style="max-width: 250px;" justify="center">
+            <v-col class="text-center" cols="4">
+              <v-btn icon flat @click="decrementQuantity">
+                <v-icon>mdi-minus</v-icon>
+              </v-btn>
+            </v-col>
+            <v-col class="text-center" cols="4">
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%;width: 100%;">
+                <v-text-field v-model="quantity" number></v-text-field>
+              </div>
+            </v-col>
+            <v-col class="text-center" cols="4">
+              <v-btn icon flat @click="incrementQuantity">
+                <v-icon>mdi-plus</v-icon>
+              </v-btn>
+            </v-col>
+          </v-row>
+          <v-spacer></v-spacer>
+        </v-card-actions>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
           <v-btn color="primary" @click="dialog = false">Close</v-btn>
+          <v-btn color="primary" @click="addItemToCart(selectedItem)">Add to Cart</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -53,17 +80,18 @@
         <v-list>
           <v-list-item class="pa-2" v-for="(cartItem, index) in cart" :key="index">
             <v-list-item-title>{{ cartItem.name }}</v-list-item-title>
-            <v-list-item-subtitle>Quantity: {{ cartItem.quantity }}</v-list-item-subtitle>
-            <v-list-item-subtitle>Price: {{ cartItem.price }}</v-list-item-subtitle>
             <template v-slot:append>
-              <v-btn icon="mdi-delete" @click="removeItemFromCart(index)">
+              {{ cartItem.quantity }} x {{ cartItem.price }} = ${{ cartItem.quantity * cartItem.price }}
+              <v-btn flat icon="mdi-delete" @click="removeItemFromCart(index)">
               </v-btn>
             </template>
           </v-list-item>
         </v-list>
+        
         <v-card-actions>
-          <v-btn color="primary" @click="checkout">Checkout</v-btn>
+          <v-spacer></v-spacer>
           <v-btn color="primary" @click="clearCart">Clear Cart</v-btn>
+          <v-btn color="primary" @click="checkout">Checkout</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

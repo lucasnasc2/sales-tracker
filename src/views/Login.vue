@@ -42,6 +42,7 @@ export default defineComponent({
     return {
       password: "",
       email: "",
+      filteredItems: [{ name: "asdbs", category: "camisetas", price: 3 }, { name: "asdbs", category: "camisetas", price: 3 }, { name: "asdbs", category: "camisetas", price: 3 }, { name: "asdbs", category: "camisetas", price: 3 }]
     };
   },
   methods: {
