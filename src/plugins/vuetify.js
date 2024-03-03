@@ -19,10 +19,10 @@ export default createVuetify({
       light: {
         dark: false,
         colors: {
-          primary: colors.deepPurple.darken1, // #E53935
-          secondary: colors.red.lighten4, // #FFCDD2
-        }
+          primary: colors.red.base, // #E53935
+          secondary: colors.deepPurple.lighten1, // #FFCDD2
+        },
       },
     },
   },
-})
+});

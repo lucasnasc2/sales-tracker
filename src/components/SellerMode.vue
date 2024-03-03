@@ -1,10 +1,16 @@
 <template>
-  <v-container>
+  <v-container class="pa-0">
     <!-- Chips for filtering -->
     <div class="px-2">
       <v-chip-group column>
-        <v-chip filter class="mx-1" v-for="(category, index) in categoryOptions" :key="index"
-          @click="toggleFilterByCategory(category)">
+        <v-chip
+          color="primary"
+          filter
+          class="mx-1"
+          v-for="(category, index) in categoryOptions"
+          :key="index"
+          @click="toggleFilterByCategory(category)"
+        >
           {{ category }}
         </v-chip>
       </v-chip-group>
@@ -13,7 +19,14 @@
     <!-- Grid of square cards -->
     <v-container>
       <v-row class="pa-1">
-        <v-col class="pa-2" v-for="(item, index) in filteredItems" :key="index" cols="6" :sm="3" :md="2">
+        <v-col
+          class="pa-2"
+          v-for="(item, index) in filteredItems"
+          :key="index"
+          cols="6"
+          :sm="3"
+          :md="2"
+        >
           <v-card @click="showDetails(item)">
             <v-card-item class="px-3 py-2">
               <div>
@@ -31,28 +44,37 @@
       </v-row>
     </v-container>
 
-
-    
     <!-- Popup dialog for product details -->
     <v-dialog v-model="dialog" max-width="500">
       <v-card>
         <v-list lines="two">
-          <v-list-item :subtitle="selectedItem.category" :title="selectedItem.name">
-            <template v-slot:append>
-              ${{ selectedItem.price }}
-            </template>
+          <v-list-item
+            density="compact"
+            :subtitle="selectedItem.category"
+            :title="selectedItem.name"
+          >
+            <template v-slot:append>{{ quantity }}x ${{ selectedItem.price * quantity }} </template>
           </v-list-item>
         </v-list>
+        <v-divider></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-row style="max-width: 250px;" justify="center">
+          <v-row style="max-width: 250px" justify="center">
             <v-col class="text-center" cols="4">
               <v-btn icon flat @click="decrementQuantity">
                 <v-icon>mdi-minus</v-icon>
               </v-btn>
             </v-col>
             <v-col class="text-center" cols="4">
-              <div style="display: flex; align-items: center; justify-content: center; height: 100%;width: 100%;">
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  height: 100%;
+                  width: 100%;
+                "
+              >
                 <v-text-field v-model="quantity" number></v-text-field>
               </div>
             </v-col>
@@ -67,8 +89,10 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" @click="dialog = false">Close</v-btn>
-          <v-btn color="primary" @click="addItemToCart(selectedItem)">Add to Cart</v-btn>
+          <v-btn @click="dialog = false">Close</v-btn>
+          <v-btn color="primary" @click="addItemToCart(selectedItem)"
+            >Add to Cart</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -77,22 +101,37 @@
     <v-dialog v-model="cartDialog" max-width="600">
       <v-card>
         <v-card-title>Cart</v-card-title>
+        <v-card-actions>
+          <v-btn color="primary" @click="clearCart">Clear Cart</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="checkout">Checkout</v-btn>
+        </v-card-actions>
         <v-list>
-          <v-list-item class="pa-2" v-for="(cartItem, index) in cart" :key="index">
-            <v-list-item-title>{{ cartItem.name }}</v-list-item-title>
+          <v-list-item>
+            <v-list-item-title>Total</v-list-item-title>
             <template v-slot:append>
-              {{ cartItem.quantity }} x {{ cartItem.price }} = ${{ cartItem.quantity * cartItem.price }}
+              {{ checkoutPrice }}
+            </template>
+          </v-list-item>
+          <v-divider></v-divider>
+          <v-list-item
+            density="compact"
+            class="pa-2"
+            v-for="(cartItem, index) in cart"
+            :key="index"
+          >
+            <v-list-item-title>{{
+              getProductById(cartItem.id).name
+            }}</v-list-item-title>
+            <template v-slot:append>
+              {{ cartItem.quantity }} x ${{ cartItem.price }} = ${{
+                cartItem.quantity * cartItem.price
+              }}
               <v-btn flat icon="mdi-delete" @click="removeItemFromCart(index)">
               </v-btn>
             </template>
           </v-list-item>
         </v-list>
-        
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" @click="clearCart">Clear Cart</v-btn>
-          <v-btn color="primary" @click="checkout">Checkout</v-btn>
-        </v-card-actions>
       </v-card>
     </v-dialog>
   </v-container>
@@ -100,9 +139,19 @@
   <!-- Fixed button with cart icon -->
 
   <div style="position: fixed; bottom: 20px; right: 20px">
-    <v-btn icon size="x-large" color="primary" @click="toggleCartDialog" :disabled="cart.length === 0">
+    <v-btn
+      icon
+      size="x-large"
+      color="primary"
+      @click="toggleCartDialog"
+      :disabled="cart.length === 0"
+    >
       <v-icon>mdi-cart</v-icon>
-      <v-badge v-if="cart.length >= 1" :content="totalQuantityInCart" overlap></v-badge>
+      <v-badge
+        v-if="cart.length >= 1"
+        :content="totalQuantityInCart"
+        overlap
+      ></v-badge>
     </v-btn>
   </div>
 </template>
@@ -152,6 +201,10 @@ export default {
     },
   },
   methods: {
+    getProductById(id) {
+      const index = this.items.findIndex((product) => product.id === id);
+      return this.items[index];
+    },
     toggleFilterByCategory(category) {
       if (
         !this.filteredCategory ||
@@ -225,5 +278,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>

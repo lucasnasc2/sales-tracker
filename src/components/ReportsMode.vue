@@ -1,26 +1,85 @@
 <template>
-  <v-container fluid class="fill-height">
+  <div class="px-3 pb-2">
+    <v-chip-group  v-model="reportMode" mandatory column>
+      <v-chip
+        color="primary"
+        filter
+        class="mx-1"
+        :value="report"
+        v-for="(report, index) in reports"
+        :key="index"
+        @click="changeReport(report)"
+      >
+        {{ report }}
+      </v-chip>
+    </v-chip-group>
+  </div>
+  <v-container fluid class="fill-height pt-0">
     <v-row align="center" justify="center" class="fill-height">
-      <v-col cols="12">
-        <v-card>
-          <v-card-title>Informe de hoy</v-card-title>
-          <v-card-text>
-            <v-list lines="two">
-              <v-list-subheader inset>Ventas</v-list-subheader>
-              <v-list-item v-for="sale in sales" :key="sale.id" :title="sale.checkoutTime">
+      <v-col v-if="sales.length" cols="12">
+        <v-card variant="tonal" color="primary">
+          <v-card-title>Informe de ventas</v-card-title>
+          <v-card-subtitle>{{
+            tsToDate(sales[0].checkoutTime)
+          }}</v-card-subtitle>
+          <v-divider></v-divider>
+          <v-card-text class="pa-0">
+            <v-list>
+              <v-list-item title="Total">
+                <template v-slot:append> ${{ totalProfit }}</template>
+              </v-list-item>
+            </v-list>
+            <v-divider></v-divider>
+            <v-list v-if="reportMode == 'categorias'">
+              <v-list-item
+                v-for="(value, key) in totalItemsByCategory"
+                :key="key"
+                density="compact"
+              >
+                <v-list-item-title>{{ key }}</v-list-item-title>
+                <template v-slot:append>
+                  x{{ value.totalQuantity }} => ${{ value.totalPrice }}</template
+                >
+              </v-list-item>
+            </v-list>
+            <v-list v-if="reportMode == 'productos'">
+              <v-list-item
+                v-for="(value, key) in totalItemsByProduct"
+                :key="key"
+                density="compact"
+              >
+                <v-list-item-title>{{
+                  getProductById(key).name
+                }}</v-list-item-title>
+                <template v-slot:append>
+                  x{{ value.totalQuantity }} => ${{ value.totalPrice }}</template
+                >
+              </v-list-item>
+            </v-list>
+            <v-list density="compact">
+
+              <v-divider></v-divider>
+              <v-list-item
+                v-for="sale in sales"
+                :key="sale.id"
+                :title="tsToDate(sale.checkoutTime)"
+                @click="selectSale(sale)"
+              >
                 <template v-slot:prepend>
                   <v-avatar color="grey-lighten-1">
                     <v-icon color="white">mdi-receipt-text</v-icon>
                   </v-avatar>
                 </template>
 
-                <template v-slot:append>
-                  ${{ sale.checkoutPrice }}
-                  <v-btn @click="selectSale(sale)" color="grey-lighten-1" icon="mdi-information" variant="text"></v-btn>
-                </template>
+                <template v-slot:append> ${{ sale.checkoutPrice }} </template>
               </v-list-item>
             </v-list>
           </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col v-else cols="12">
+        <v-card variant="tonal">
+          <v-card-title>Seleccione una fecha</v-card-title>
         </v-card>
       </v-col>
     </v-row>
@@ -29,29 +88,33 @@
   <v-dialog v-model="dialog" max-width="500px">
     <v-card>
       <v-card-title>Venta {{ selectedSale.id }}</v-card-title>
-      <v-card-subtitle>{{ selectedSale.checkoutTime }}</v-card-subtitle>
+      <v-card-subtitle>{{
+        tsToDate(selectedSale.checkoutTime)
+      }}</v-card-subtitle>
       <v-card-text class="px-0">
         <div class="d-flex py-0 justify-space-between">
           <v-list-item density="compact">
-            <v-list-item-title>Subtotal</v-list-item-title>
+            <v-list-item-title>Total</v-list-item-title>
           </v-list-item>
 
           <v-list-item density="compact">
-            <v-list-item-title>${{ selectedSale.checkoutPrice }}</v-list-item-title>
+            <v-list-item-title
+              >${{ selectedSale.checkoutPrice }}</v-list-item-title
+            >
           </v-list-item>
         </div>
+
         <v-divider></v-divider>
         <v-list lines="two">
           <v-list-subheader>Productos</v-list-subheader>
 
-          <v-list-item v-for="item in selectedSale.items" :key="item.id" :subtitle="'x' + item.quantity" :title="item.id">
-            <template v-slot:prepend>
-
-            </template>
-
-            <template v-slot:append>
-              ${{ item.price }}
-            </template>
+          <v-list-item
+            v-for="item in selectedSale.items"
+            :key="item.id"
+            :subtitle="getProductById(item.id).category"
+            :title="getProductById(item.id).name"
+          >
+            <template v-slot:append>{{ item.quantity }}x ${{ item.price }} = ${{ item.quantity*item.price }} </template>
           </v-list-item>
         </v-list>
       </v-card-text>
@@ -61,13 +124,23 @@
   <v-dialog v-model="showDatePicker" max-width="500px">
     <v-container>
       <v-row justify="space-around">
-        <v-date-picker @update:model-value="chengeDate" show-adjacent-months></v-date-picker>
+        <v-date-picker
+          color="primary"
+          :max="todaysDateString"
+          @update:model-value="chengeDate"
+          show-adjacent-months
+        ></v-date-picker>
       </v-row>
     </v-container>
   </v-dialog>
 
   <div style="position: fixed; bottom: 20px; right: 20px">
-    <v-btn icon="mdi-calendar" size="x-large" color="primary" @click="showDatePicker = true"></v-btn>
+    <v-btn
+      icon="mdi-calendar"
+      size="x-large"
+      color="primary"
+      @click="showDatePicker = true"
+    ></v-btn>
   </div>
 </template>
 
@@ -86,16 +159,18 @@ export default {
       selectedDate: todaysDate, // Initialize with current date
       selectedSale: {
         checkoutPrice: 0,
-        userId: '',
-        checkoutTime: '',
-        id: '',
-        items: []
+        userId: "",
+        checkoutTime: "",
+        id: "",
+        items: [],
       },
       dialog: false,
       filteredSales: [],
       sales: [],
       salesReport: [],
       products: [],
+      reports: ["productos", "categorias"],
+      reportMode: "productos",
       showDatePicker: false, // Initialize with an empty array
     };
   },
@@ -105,27 +180,55 @@ export default {
       return new Date(this.selectedDate).toLocaleDateString();
     },
     totalItemsByCategory() {
-      const totalItems = {};
-      for (const sale of this.filteredSales) {
+      const totalsByCategory = {};
+
+      for (const sale of this.sales) {
         for (const item of sale.items) {
-          if (!totalItems[item.category]) {
-            totalItems[item.category] = 0;
+          if (!totalsByCategory[item.category]) {
+            totalsByCategory[item.category] = {
+              totalQuantity: 0,
+              totalPrice: 0,
+            };
           }
-          totalItems[item.category] += item.quantity;
+          totalsByCategory[item.category].totalQuantity += item.quantity;
+          totalsByCategory[item.category].totalPrice +=
+            item.price * item.quantity;
         }
       }
-      return totalItems;
+
+      return totalsByCategory;
+    },
+    totalItemsByProduct() {
+      const totalsByProduct = {};
+
+      for (const sale of this.sales) {
+        for (const item of sale.items) {
+          if (!totalsByProduct[item.id]) {
+            totalsByProduct[item.id] = {
+              totalQuantity: 0,
+              totalPrice: 0,
+            };
+          }
+          totalsByProduct[item.id].totalQuantity += item.quantity;
+          totalsByProduct[item.id].totalPrice += item.price * item.quantity;
+        }
+      }
+
+      return totalsByProduct;
     },
     totalProfit() {
       let total = 0;
-      for (const sale of this.filteredSales) {
+      for (const sale of this.sales) {
         total += sale.checkoutPrice;
       }
       return total;
     },
     saleIsSelected() {
-      return !!selectedSale
-    }
+      return !!selectedSale;
+    },
+    todaysDateString() {
+      return todaysDate.toDateString();
+    },
   },
   watch: {
     selectedDate: {
@@ -149,7 +252,7 @@ export default {
     },
     "salesStore.salesReport": {
       handler(newValue, oldValue) {
-        this.salesReport.splice(0, this.salesReport.length, ...newValue);
+        this.sales.splice(0, this.sales.length, ...newValue);
       },
       immediate: true, // Immediately trigger the handler with the current value
     },
@@ -157,28 +260,29 @@ export default {
   mounted() {
     this.productStore.fetchProducts();
     this.salesStore.fetchSales(todaysDate, tomorrow);
+    console.log("mounted");
   },
   methods: {
+    getProductById(id) {
+      const index = this.products.findIndex((product) => product.id === id);
+      return this.products[index];
+    },
+    tsToDate(timestamp) {
+      const milliseconds = timestamp.toMillis();
+      // Create a new JavaScript Date object using the milliseconds
+      const convertedDate = new Date(milliseconds).toLocaleString();
+      return convertedDate;
+    },
     selectSale(sale) {
-      this.selectedSale = { ...sale }
-      this.dialog = true
+      this.selectedSale = { ...sale };
+      this.dialog = true;
     },
     chengeDate(v) {
-      console.log("1", v);
       this.selectedDate = v;
-      console.log("2", this.selectedDate);
+      this.showDatePicker = false;
     },
-    // Method to format checkout time (if needed)
-    formatCheckoutTime(timestamp) {
-      // Convert Firestore timestamp to milliseconds
-      const milliseconds =
-        timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000;
-
-      // Create a JavaScript Date object
-      const date = new Date(milliseconds);
-
-      // Format the date to your preference (e.g., using toLocaleString)
-      return date.toLocaleString(); // Adjust the format as needed
+    changeReport(mode) {
+      this.reportMode = mode;
     },
   },
 };
