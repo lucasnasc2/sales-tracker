@@ -124,12 +124,7 @@
   <v-dialog v-model="showDatePicker" max-width="500px">
     <v-container>
       <v-row justify="space-around">
-        <v-date-picker
-          color="primary"
-          :max="todaysDateString"
-          @update:model-value="chengeDate"
-          show-adjacent-months
-        ></v-date-picker>
+        <v-date-picker multiple v-model="dates" color="primary" :max="todaysDateString" show-adjacent-months></v-date-picker>
       </v-row>
     </v-container>
   </v-dialog>
@@ -156,7 +151,9 @@ tomorrow.setDate(todaysDate.getDate() + 1);
 export default {
   data() {
     return {
-      selectedDate: todaysDate, // Initialize with current date
+      selectedDate: todaysDate,
+      dates: [],
+      dateRange: [],
       selectedSale: {
         checkoutPrice: 0,
         userId: "",
@@ -256,6 +253,18 @@ export default {
       },
       immediate: true, // Immediately trigger the handler with the current value
     },
+    dates(v, oldV) {
+      console.log(v);
+      if (v.length < oldV.length) {
+        if (v.length <= 1) return
+        this.date = [this.findMissingDate(oldV, v)]
+      } else if (v.toString() != oldV.toString()) {
+        this.sortAndFillDates(v)
+      }
+      if(v.length > 1) {
+        this.dateRange.push(v[0], v[v.length -1])
+      }
+    }
   },
   mounted() {
     this.productStore.fetchProducts();
@@ -283,6 +292,54 @@ export default {
     },
     changeReport(mode) {
       this.reportMode = mode;
+    },
+    findMissingDate(sortedArray1, sortedArray2) {
+      // Iterate through both arrays simultaneously
+      for (let i = 0; i < sortedArray1.length; i++) {
+        // If dates at current indices are not equal, return the date from the first array
+        if (sortedArray1[i] !== sortedArray2[i]) {
+          console.log(sortedArray2[i]);
+          return sortedArray1[i];
+        }
+      }
+      // If no difference found, return the last date from the first array
+      console.log("no difference");
+      return sortedArray1[sortedArray1.length - 1];
+    },
+    sortAndFillDates(dateArray) {
+      if (dateArray.length <= 1) return
+      // Sort the input array of dates
+      dateArray.sort((a, b) => a - b);
+
+      // Function to get dates between two dates
+      function getDatesBetween(startDate, endDate) {
+        const dates = [];
+        let currentDate = new Date(startDate);
+
+        while (currentDate <= endDate) {
+          dates.push(new Date(currentDate));
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        return dates;
+      }
+
+      // Initialize result array with first date from input array
+      const resultArray = [new Date(dateArray[0])];
+
+      // Loop through input array to add dates in between
+      for (let i = 0; i < dateArray.length - 1; i++) {
+        const currentDate = new Date(dateArray[i]);
+        const nextDate = new Date(dateArray[i + 1]);
+
+        // Get dates in between current and next date
+        const datesBetween = getDatesBetween(currentDate, nextDate);
+
+        // Add dates in between to result array
+        resultArray.push(...datesBetween.slice(1));
+      }
+
+      this.dates = resultArray;
     },
   },
 };

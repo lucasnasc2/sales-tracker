@@ -4,7 +4,6 @@
       <v-icon>mdi-hammer-sickle</v-icon>
     </template>
   </v-app-bar>
-  <FileUploader />
   <v-main class="custom-main">
     
     <v-container fluid class="fill-height">
