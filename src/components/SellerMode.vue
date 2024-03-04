@@ -17,7 +17,7 @@
     </div>
 
     <!-- Grid of square cards -->
-    <ProductGrid :items="filteredItems" @selected="showDetails(item)"></ProductGrid>
+    <ProductGrid :items="filteredItems" @selected="showDetails"></ProductGrid>
 
     <!-- Popup dialog for product details -->
     <v-dialog v-model="dialog" max-width="500">

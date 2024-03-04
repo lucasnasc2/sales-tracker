@@ -2,9 +2,9 @@
     <v-container>
       <v-row class="pa-1">
         <v-col class="pa-2" v-for="(item, index) in items" :key="index" cols="6" :sm="3" :md="2">
-          <v-card @click="selectItem(item)">
-            <v-img class="align-end text-white" height="30" :src="item.img" cover>
-              <v-card-title>{{ item.name }}</v-card-title>
+          <v-card @click="selectItem(item)" >
+            <v-img class="align-end text-white" height="100" :src="item.img" cover>
+              <v-card-title :style="!item.img ? 'color: black;': ''">{{ item.name }}</v-card-title>
             </v-img>
             <v-list lines="one">
               <v-list-item density="compact" :subtitle="item.category">

@@ -11,17 +11,17 @@
     </div>
 
     <!-- Grid of square cards -->
-    <ProductGrid :items="filteredItems" @selected="editItem(item)"></ProductGrid>
+    <ProductGrid :items="filteredItems" @selected="editItem"></ProductGrid>
 
     <!-- Popup dialog -->
     <v-dialog v-model="dialog" max-width="500">
-      <v-card>
+      <v-card v-if="dialog">
         <v-card-title>{{
           isEditing ? "Edit Item" : "Add Product"
         }}</v-card-title>
         <v-card-text>
-          <FileUploader @imageUploaded="handleImageUploaded" />
-          <v-form ref="form">
+          <FileUploader :src="editedItem.img" @fileDiscarded="editedItem.img=''" @imageUploaded="handleImageUploaded" />
+          <v-form class="mt-4" ref="form">
             <v-text-field v-model="editedItem.name" label="Name" @input="checkFieldsFilled"></v-text-field>
             <v-text-field v-model="editedItem.description" label="Description" @input="checkFieldsFilled"></v-text-field>
             <v-text-field v-model="editedItem.category" label="Category" @input="checkFieldsFilled"></v-text-field>
