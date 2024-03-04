@@ -228,13 +228,6 @@ export default {
     },
   },
   watch: {
-    selectedDate: {
-      handler(newValue, oldValue) {
-        let t = new Date(newValue);
-        t.setDate(t.getDate() + 1);
-        this.salesStore.fetchSalesReport(newValue, t);
-      },
-    },
     "productStore.products": {
       handler(newValue, oldValue) {
         this.products.splice(0, this.products.length, ...newValue);
@@ -253,16 +246,18 @@ export default {
       },
       immediate: true, // Immediately trigger the handler with the current value
     },
-    dates(v, oldV) {
-      console.log(v);
-      if (v.length < oldV.length) {
-        if (v.length <= 1) return
-        this.date = [this.findMissingDate(oldV, v)]
-      } else if (v.toString() != oldV.toString()) {
-        this.sortAndFillDates(v)
-      }
-      if(v.length > 1) {
-        this.dateRange.push(v[0], v[v.length -1])
+    "dates":{
+      handler(v, oldV) {
+        console.log(v);
+        if (v.length < oldV.length) {
+          if (v.length <= 1) return
+          this.date = [this.findMissingDate(oldV, v)]
+        } else if (v.toString() != oldV.toString()) {
+          this.sortAndFillDates(v)
+        }
+        if(v.length > 1) {
+          this.dateRange.push(v[0], v[v.length -1])
+        }
       }
     }
   },
