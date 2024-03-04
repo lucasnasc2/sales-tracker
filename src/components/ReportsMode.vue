@@ -1,6 +1,6 @@
 <template>
   <div class="px-3 pb-2">
-    <v-chip-group  v-model="reportMode" mandatory column>
+    <v-chip-group :disabled="!sales.length" v-model="reportMode" mandatory column>
       <v-chip
         color="primary"
         filter
