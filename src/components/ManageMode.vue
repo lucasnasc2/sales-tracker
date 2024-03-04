@@ -3,13 +3,8 @@
     <!-- Chips for filtering -->
     <div class="px-2">
       <v-chip-group column>
-        <v-chip
-          filter
-          class="mx-1"
-          v-for="(category, index) in categoryOptions"
-          :key="index"
-          @click="toggleFilterByCategory(category)"
-        >
+        <v-chip filter class="mx-1" v-for="(category, index) in categoryOptions" :key="index"
+          @click="toggleFilterByCategory(category)">
           {{ category }}
         </v-chip>
       </v-chip-group>
@@ -18,16 +13,17 @@
     <!-- Grid of square cards -->
     <v-container>
       <v-row class="pa-1">
-        <v-col
-          class="pa-2"
-          v-for="(item, index) in filteredItems"
-          :key="index"
-          cols="6"
-          :sm="3"
-          :md="2"
-        >
+        <v-col class="pa-2" v-for="(item, index) in filteredItems" :key="index" cols="6" :sm="3" :md="2">
           <v-card @click="editItem(item)">
-            <v-card-item class="px-3 py-2">
+            <v-img class="align-end text-white" height="30" :src="item.img" cover>
+              <v-card-title>{{ item.name }}</v-card-title>
+            </v-img>
+            <v-list lines="one">
+              <v-list-item density="compact" :subtitle="item.category">
+                <template v-slot:append>${{ item.price * quantity }}</template>
+              </v-list-item>
+            </v-list>
+            <!-- <v-card-item class="px-3 py-2">
               <div>
                 <div class="text-caption mb-1">
                   {{ item.category }}
@@ -37,7 +33,7 @@
                 </div>
                 <div class="text-caption text-end">${{ item.price }}</div>
               </div>
-            </v-card-item>
+            </v-card-item> -->
           </v-card>
         </v-col>
       </v-row>
@@ -50,39 +46,20 @@
           isEditing ? "Edit Item" : "Add Product"
         }}</v-card-title>
         <v-card-text>
+          <FileUploader @imageUploaded="handleImageUploaded" />
           <v-form ref="form">
-            <v-text-field
-              v-model="editedItem.name"
-              label="Name"
-              @input="checkFieldsFilled"
-            ></v-text-field>
-            <v-text-field
-              v-model="editedItem.description"
-              label="Description"
-              @input="checkFieldsFilled"
-            ></v-text-field>
-            <v-text-field
-              v-model="editedItem.category"
-              label="Category"
-              @input="checkFieldsFilled"
-            ></v-text-field>
-            <v-text-field
-              v-model="editedItem.price"
-              label="Price"
-              @input="checkFieldsFilled"
-            ></v-text-field>
+            <v-text-field v-model="editedItem.name" label="Name" @input="checkFieldsFilled"></v-text-field>
+            <v-text-field v-model="editedItem.description" label="Description" @input="checkFieldsFilled"></v-text-field>
+            <v-text-field v-model="editedItem.category" label="Category" @input="checkFieldsFilled"></v-text-field>
+            <v-text-field v-model="editedItem.price" label="Price" @input="checkFieldsFilled"></v-text-field>
           </v-form>
         </v-card-text>
         <v-card-actions>
           <v-btn v-if="isEditing" @click="confirmDelete">Delete</v-btn>
           <v-spacer></v-spacer>
           <v-btn @click="dialog = false">Cancel</v-btn>
-          <v-btn
-            color="primary"
-            @click="saveChanges"
-            :disabled="!checkFieldsFilled()"
-            >{{ isEditing ? "Save" : "Add" }}</v-btn
-          >
+          <v-btn color="primary" @click="saveChanges" :disabled="!checkFieldsFilled()">{{ isEditing ? "Save" : "Add"
+          }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -154,6 +131,9 @@ export default {
       this.filteredItems = this.items.filter((item) =>
         !!this.filteredCategory ? this.filteredCategory == item.category : true
       );
+    },
+    handleImageUploaded(compressedImage) {
+      this.editedItem.img = compressedImage
     },
     editItem(item) {
       this.editedItem = { ...item };
