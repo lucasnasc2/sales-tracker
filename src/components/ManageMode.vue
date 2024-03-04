@@ -57,6 +57,11 @@
               @input="checkFieldsFilled"
             ></v-text-field>
             <v-text-field
+              v-model="editedItem.description"
+              label="Description"
+              @input="checkFieldsFilled"
+            ></v-text-field>
+            <v-text-field
               v-model="editedItem.category"
               label="Category"
               @input="checkFieldsFilled"
