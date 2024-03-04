@@ -11,33 +11,7 @@
     </div>
 
     <!-- Grid of square cards -->
-    <v-container>
-      <v-row class="pa-1">
-        <v-col class="pa-2" v-for="(item, index) in filteredItems" :key="index" cols="6" :sm="3" :md="2">
-          <v-card @click="editItem(item)">
-            <v-img class="align-end text-white" height="30" :src="item.img" cover>
-              <v-card-title>{{ item.name }}</v-card-title>
-            </v-img>
-            <v-list lines="one">
-              <v-list-item density="compact" :subtitle="item.category">
-                <template v-slot:append>${{ item.price * quantity }}</template>
-              </v-list-item>
-            </v-list>
-            <!-- <v-card-item class="px-3 py-2">
-              <div>
-                <div class="text-caption mb-1">
-                  {{ item.category }}
-                </div>
-                <div class="text-h7 mb-1">
-                  {{ item.name }}
-                </div>
-                <div class="text-caption text-end">${{ item.price }}</div>
-              </div>
-            </v-card-item> -->
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
+    <ProductGrid :items="filteredItems" @selected="editItem(item)"></ProductGrid>
 
     <!-- Popup dialog -->
     <v-dialog v-model="dialog" max-width="500">

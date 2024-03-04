@@ -17,32 +17,7 @@
     </div>
 
     <!-- Grid of square cards -->
-    <v-container>
-      <v-row class="pa-1">
-        <v-col
-          class="pa-2"
-          v-for="(item, index) in filteredItems"
-          :key="index"
-          cols="6"
-          :sm="3"
-          :md="2"
-        >
-          <v-card @click="showDetails(item)">
-            <v-card-item class="px-3 py-2">
-              <div>
-                <div class="text-caption mb-1">
-                  {{ item.category }}
-                </div>
-                <div class="text-h7 mb-1">
-                  {{ item.name }}
-                </div>
-                <div class="text-caption text-end">${{ item.price }}</div>
-              </div>
-            </v-card-item>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
+    <ProductGrid :items="filteredItems" @selected="showDetails(item)"></ProductGrid>
 
     <!-- Popup dialog for product details -->
     <v-dialog v-model="dialog" max-width="500">
