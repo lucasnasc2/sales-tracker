@@ -16,7 +16,10 @@ import {
 } from "firebase/firestore";
 import firebaseApp from "../firebase.js";
 const db = getFirestore(firebaseApp);
-connectFirestoreEmulator(db, "127.0.0.1", 8080);
+if (import.meta.env.DEV) {
+  connectFirestoreEmulator(db, "127.0.0.1", 8080);
+}
+
 
 // You can name the return value of `defineStore()` anything you want,
 // but it's best to use the name of the store and surround it with `use`
@@ -81,11 +84,10 @@ export const useSalesStore = defineStore("sales", {
           };
           sales.push(sale);
         });
-        this.sales = sales; // Update store state with fetched products
+        this.sales = sales;
         console.log(this.sales);
       });
 
-      // Optionally return the unsubscribe function if needed
       this.salesSubscription = unsubscribe
     },
     async fetchSalesReport(startDate, endDate) {

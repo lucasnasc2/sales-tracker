@@ -9,25 +9,14 @@ import { registerPlugins } from "@/plugins";
 
 // Components
 import App from "./App.vue";
-import Home from "./views/Home.vue";
-import Login from "./views/Login.vue";
 
 import { createApp } from "vue";
-import { createRouter, createWebHistory } from "vue-router";
+import router from "./router";
 import { createPinia } from "pinia";
 import { useUserStore } from "./store/user.js";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import firebaseApp from "./firebase.js";
 
-const routes = [
-  { path: "/", name: "Home", component: Home },
-  { path: "/login", name: "Login", component: Login },
-];
-
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-});
 
 const pinia = createPinia();
 const app = createApp(App);
@@ -36,6 +25,7 @@ registerPlugins(app);
 app.use(router);
 app.use(pinia);
 app.mount("#app");
+
 const userStore = useUserStore();
 let isLoggedIn = false;
 const auth = getAuth(firebaseApp);

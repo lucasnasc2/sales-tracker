@@ -30,23 +30,20 @@
 
 <script>
 import { defineComponent } from "vue";
-import { getAuth, signOut } from "firebase/auth";
-import firebaseApp from "../firebase.js";
 import { mapStores } from "pinia";
 import { useModeStore } from "@/store/modes.js";
+import { useUserStore } from "@/store/user";
 
-const auth = getAuth(firebaseApp);
 
 export default defineComponent({
   name: "Home",
   data() {
     return {
       drawer: false,
-      mode: "seller",
     };
   },
   computed: {
-    ...mapStores(useModeStore),
+    ...mapStores(useModeStore, useUserStore),
   },
   watch: {
     "modeStore.mode": {
@@ -57,13 +54,7 @@ export default defineComponent({
   },
   methods: {
     logout() {
-      signOut(auth)
-        .then(() => {
-          this.$router.push("login");
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      this.userStore.logout()
     },
   },
 });

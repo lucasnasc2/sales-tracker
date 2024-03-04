@@ -64,3 +64,5 @@ node_modules/
 
 # dotenv environment variables file
 .env*
+src/.DS_Store
+.DS_Store

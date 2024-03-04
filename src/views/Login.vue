@@ -27,14 +27,8 @@
 
 <script>
 import { defineComponent } from "vue";
-import {
-  getAuth,
-  connectAuthEmulator,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import firebaseApp from "../firebase.js";
-const auth = getAuth(firebaseApp);
-connectAuthEmulator(auth, "http://127.0.0.1:9099");
+import { mapStores } from "pinia";
+import { useUserStore } from "@/store/user";
 
 export default defineComponent({
   name: "Login",
@@ -44,23 +38,12 @@ export default defineComponent({
       email: "",
     };
   },
+  computed: {
+    ...mapStores(useUserStore),
+  },
   methods: {
-    async login() {
-      try {
-        const userCredential = await signInWithEmailAndPassword(
-          auth,
-          this.email,
-          this.password
-        );
-        // Signed in
-        const user = userCredential.user;
-        console.log(user);
-        this.$router.push('/')
-      } catch (error) {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorCode, errorMessage);
-      }
+    login() {
+      this.userStore.login(this.email, this.password)
     },
   },
 });
