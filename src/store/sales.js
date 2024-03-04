@@ -91,7 +91,8 @@ export const useSalesStore = defineStore("sales", {
       this.salesSubscription = unsubscribe
     },
     async fetchSalesReport(startDate, endDate) {
-      console.log(startDate, endDate);
+      console.log("start",startDate);
+      console.log("end" ,endDate);
       const q = query(
         collection(db, "sales"),
         where("checkoutTime", ">=", startDate),

@@ -1,6 +1,11 @@
 <template>
   <div class="px-3 pb-2">
-    <v-chip-group :disabled="!sales.length" v-model="reportMode" mandatory column>
+    <v-chip-group
+      :disabled="!sales.length"
+      v-model="reportMode"
+      mandatory
+      column
+    >
       <v-chip
         color="primary"
         filter
@@ -19,9 +24,12 @@
       <v-col v-if="sales.length" cols="12">
         <v-card variant="tonal" color="primary">
           <v-card-title>Informe de ventas</v-card-title>
-          <v-card-subtitle>{{
-            tsToDate(sales[0].checkoutTime)
-          }}</v-card-subtitle>
+          <v-card-subtitle
+            >desde: {{ tsToDate(sales[0].checkoutTime)
+            }}<span v-if="sales.length > 1"> hasta:{{
+              tsToDate(sales[sales.length - 1].checkoutTime)
+            }}</span></v-card-subtitle
+          >
           <v-divider></v-divider>
           <v-card-text class="pa-0">
             <v-list>
@@ -38,7 +46,9 @@
               >
                 <v-list-item-title>{{ key }}</v-list-item-title>
                 <template v-slot:append>
-                  x{{ value.totalQuantity }} => ${{ value.totalPrice }}</template
+                  x{{ value.totalQuantity }} => ${{
+                    value.totalPrice
+                  }}</template
                 >
               </v-list-item>
             </v-list>
@@ -52,12 +62,13 @@
                   getProductById(key).name
                 }}</v-list-item-title>
                 <template v-slot:append>
-                  x{{ value.totalQuantity }} => ${{ value.totalPrice }}</template
+                  x{{ value.totalQuantity }} => ${{
+                    value.totalPrice
+                  }}</template
                 >
               </v-list-item>
             </v-list>
             <v-list density="compact">
-
               <v-divider></v-divider>
               <v-list-item
                 v-for="sale in sales"
@@ -114,19 +125,31 @@
             :subtitle="getProductById(item.id).category"
             :title="getProductById(item.id).name"
           >
-            <template v-slot:append>{{ item.quantity }}x ${{ item.price }} = ${{ item.quantity*item.price }} </template>
+            <template v-slot:append
+              >{{ item.quantity }}x ${{ item.price }} = ${{
+                item.quantity * item.price
+              }}
+            </template>
           </v-list-item>
         </v-list>
       </v-card-text>
     </v-card>
   </v-dialog>
 
-  <v-dialog v-model="showDatePicker" max-width="500px">
-    <v-container>
-      <v-row justify="space-around">
-        <v-date-picker multiple v-model="dates" color="primary" :max="todaysDateString" show-adjacent-months></v-date-picker>
-      </v-row>
-    </v-container>
+  <v-dialog v-model="showDatePicker" max-width="328">
+    <v-card>
+      <v-date-picker
+        multiple
+        v-model="dates"
+        color="primary"
+        :max="todaysDateString"
+        show-adjacent-months
+      ></v-date-picker>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn @click="fetchSalesReport">Consultar</v-btn>
+      </v-card-actions>
+    </v-card>
   </v-dialog>
 
   <div style="position: fixed; bottom: 20px; right: 20px">
@@ -246,25 +269,24 @@ export default {
       },
       immediate: true, // Immediately trigger the handler with the current value
     },
-    "dates":{
+    dates: {
       handler(v, oldV) {
-        console.log(v);
-        if (v.length < oldV.length) {
-          if (v.length <= 1) return
-          this.date = [this.findMissingDate(oldV, v)]
-        } else if (v.toString() != oldV.toString()) {
-          this.sortAndFillDates(v)
+        if (v.length > 1) {
+          if (v.length < oldV.length) {
+            this.dates = [this.findMissingDate(oldV, v)];
+          } else if (v.toString() != oldV.toString()) {
+            this.sortAndFillDates(v);
+          }
+          this.dateRange = [v[0], v[v.length - 1]];
+        } else if (v.length == 1) {
+          this.dateRange = [v[0]];
         }
-        if(v.length > 1) {
-          this.dateRange.push(v[0], v[v.length -1])
-        }
-      }
-    }
+      },
+    },
   },
   mounted() {
     this.productStore.fetchProducts();
     this.salesStore.fetchSales(todaysDate, tomorrow);
-    console.log("mounted");
   },
   methods: {
     getProductById(id) {
@@ -276,6 +298,16 @@ export default {
       // Create a new JavaScript Date object using the milliseconds
       const convertedDate = new Date(milliseconds).toLocaleString();
       return convertedDate;
+    },
+    fetchSalesReport() {
+      let startDate = new Date(this.dateRange[0]);
+      let endDate = new Date(this.dateRange[1]
+        ? this.dateRange[1].setDate(this.dateRange[1].getDate() + 1)
+        : this.dateRange[0].setDate(this.dateRange[0].getDate() + 1));
+      this.salesStore.fetchSalesReport(startDate, endDate);
+      this.dates = [];
+      this.dateRange = [];
+      this.showDatePicker = false;
     },
     selectSale(sale) {
       this.selectedSale = { ...sale };
@@ -293,16 +325,14 @@ export default {
       for (let i = 0; i < sortedArray1.length; i++) {
         // If dates at current indices are not equal, return the date from the first array
         if (sortedArray1[i] !== sortedArray2[i]) {
-          console.log(sortedArray2[i]);
           return sortedArray1[i];
         }
       }
       // If no difference found, return the last date from the first array
-      console.log("no difference");
       return sortedArray1[sortedArray1.length - 1];
     },
     sortAndFillDates(dateArray) {
-      if (dateArray.length <= 1) return
+      if (dateArray.length <= 1) return;
       // Sort the input array of dates
       dateArray.sort((a, b) => a - b);
 
