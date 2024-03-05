@@ -36,7 +36,7 @@ export const useSalesStore = defineStore("sales", {
       try {
         let saleObject = {
           ...sale,
-          userId: userStore.user.uid,
+          userId: userStore.user.email,
           checkoutTime: serverTimestamp(),
         };
         const docRef = await addDoc(collection(db, "sales"), saleObject);
