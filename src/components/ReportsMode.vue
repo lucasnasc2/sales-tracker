@@ -102,6 +102,9 @@
       <v-card-subtitle>{{
         tsToDate(selectedSale.checkoutTime)
       }}</v-card-subtitle>
+      <v-card-subtitle>{{
+        selectedSale.userId
+      }}</v-card-subtitle>
       <v-card-text class="px-0">
         <div class="d-flex py-0 justify-space-between">
           <v-list-item density="compact">
