@@ -34,7 +34,7 @@
           <v-card-text class="pa-0">
             <v-list>
               <v-list-item title="Total">
-                <template v-slot:append> ${{ totalProfit }}</template>
+                <template v-slot:append> {{$globals.currency}}{{ totalProfit }}</template>
               </v-list-item>
             </v-list>
             <v-divider></v-divider>
@@ -46,7 +46,7 @@
               >
                 <v-list-item-title>{{ key }}</v-list-item-title>
                 <template v-slot:append>
-                  x{{ value.totalQuantity }} => ${{
+                  x{{ value.totalQuantity }} => {{$globals.currency}}{{
                     value.totalPrice
                   }}</template
                 >
@@ -62,7 +62,7 @@
                   getProductById(key).name
                 }}</v-list-item-title>
                 <template v-slot:append>
-                  x{{ value.totalQuantity }} => ${{
+                  x{{ value.totalQuantity }} => {{$globals.currency}}{{
                     value.totalPrice
                   }}</template
                 >
@@ -82,7 +82,7 @@
                   </v-avatar>
                 </template>
 
-                <template v-slot:append> ${{ sale.checkoutPrice }} </template>
+                <template v-slot:append> {{$globals.currency}}{{ sale.checkoutPrice }} </template>
               </v-list-item>
             </v-list>
           </v-card-text>
@@ -110,7 +110,7 @@
 
           <v-list-item density="compact">
             <v-list-item-title
-              >${{ selectedSale.checkoutPrice }}</v-list-item-title
+              >{{$globals.currency}}{{ selectedSale.checkoutPrice }}</v-list-item-title
             >
           </v-list-item>
         </div>
@@ -126,7 +126,7 @@
             :title="getProductById(item.id).name"
           >
             <template v-slot:append
-              >{{ item.quantity }}x ${{ item.price }} = ${{
+              >{{ item.quantity }}x {{$globals.currency}}{{ item.price }} = {{$globals.currency}}{{
                 item.quantity * item.price
               }}
             </template>

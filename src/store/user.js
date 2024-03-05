@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { useProductStore } from "./products.js";
 import { useSalesStore } from "./sales.js";
+import { useAlertStore } from "./alerts.js";
 import {
   getAuth,
   connectAuthEmulator,
@@ -25,6 +26,7 @@ export const useUserStore = defineStore("user", {
   },
   actions: {
     async login(email, password) {
+      const alertStore = useAlertStore();
       try {
         const userCredential = await signInWithEmailAndPassword(
           auth,
@@ -39,9 +41,11 @@ export const useUserStore = defineStore("user", {
         const errorCode = error.code;
         const errorMessage = error.message;
         console.log(errorCode, errorMessage);
+        alertStore.setAlert(error,errorMessage, 5)
       }
     },
     logout() {
+      const alertStore = useAlertStore();
       const productStore = useProductStore();
       const salesStore = useSalesStore();
       if (productStore.productsSubscription) {
@@ -56,6 +60,7 @@ export const useUserStore = defineStore("user", {
         })
         .catch((error) => {
           console.log(error);
+          alertStore.setAlert(error,"error", 5)
         });
     },
   },

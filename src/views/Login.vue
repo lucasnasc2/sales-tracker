@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar title="Ventas CMI">
+  <v-app-bar :title="$globals.organizationName">
     <template v-slot:prepend>
       <v-icon>mdi-hammer-sickle</v-icon>
     </template>

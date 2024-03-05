@@ -16,6 +16,7 @@ import { createPinia } from "pinia";
 import { useUserStore } from "./store/user.js";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import firebaseApp from "./firebase.js";
+import globalConfigPlugin from './plugins/globalConfigPlugin';
 
 
 const pinia = createPinia();
@@ -24,6 +25,7 @@ registerPlugins(app);
 
 app.use(router);
 app.use(pinia);
+app.use(globalConfigPlugin);
 app.mount("#app");
 
 const userStore = useUserStore();

@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar color="primary" title="Ventas CMI">
+  <v-app-bar color="primary" :title="$globals.organizationName">
     <template v-slot:prepend>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
     </template>

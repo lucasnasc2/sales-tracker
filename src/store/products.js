@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { useAlertStore } from "./alerts.js";
 import {
   getFirestore,
   connectFirestoreEmulator,

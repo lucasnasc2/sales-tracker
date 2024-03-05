@@ -44,6 +44,9 @@
 </template>
 
 <script>
+import { mapStores } from 'pinia';
+import { useAlertStore } from '@/store/alerts';
+
 export default {
   props: {
     src: {
@@ -56,6 +59,9 @@ export default {
       file: null,
       previewUrl: null,
     };
+  },
+  computed: {
+...mapStores(useAlertStore)
   },
   methods: {
     discardFile() {
@@ -88,6 +94,8 @@ export default {
         })
         .catch((error) => {
           console.error("Error processing the file:", error);
+          this.alertStore.setAlert(error,"error",8)
+          
         });
     },
     async processFile() {

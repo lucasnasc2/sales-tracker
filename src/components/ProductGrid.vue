@@ -8,7 +8,7 @@
             </v-img>
             <v-list lines="one">
               <v-list-item density="compact" :subtitle="item.category">
-                <template v-slot:append>${{ item.price }}</template>
+                <template v-slot:append>{{$globals.currency}}{{ item.price }}</template>
               </v-list-item>
             </v-list>
           </v-card>

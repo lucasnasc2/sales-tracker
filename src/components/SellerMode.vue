@@ -28,7 +28,7 @@
             :subtitle="selectedItem.category"
             :title="selectedItem.name"
           >
-            <template v-slot:append>{{ quantity }}x ${{ selectedItem.price * quantity }} </template>
+            <template v-slot:append>{{ quantity }}x {{$globals.currency}}{{ selectedItem.price * quantity }} </template>
           </v-list-item>
         </v-list>
         <v-divider></v-divider>
@@ -99,7 +99,7 @@
               getProductById(cartItem.id).name
             }}</v-list-item-title>
             <template v-slot:append>
-              {{ cartItem.quantity }} x ${{ cartItem.price }} = ${{
+              {{ cartItem.quantity }} x {{$globals.currency}}{{ cartItem.price }} = {{$globals.currency}}{{
                 cartItem.quantity * cartItem.price
               }}
               <v-btn flat icon="mdi-delete" @click="removeItemFromCart(index)">
