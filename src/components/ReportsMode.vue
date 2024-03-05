@@ -1,7 +1,7 @@
 <template>
   <div class="px-3 pb-2">
     <v-chip-group
-      :disabled="!sales.length"
+      :disabled="!salesStore.sales.length"
       v-model="reportMode"
       mandatory
       column
@@ -21,20 +21,26 @@
   </div>
   <v-container fluid class="fill-height pt-0">
     <v-row align="center" justify="center" class="fill-height">
-      <v-col v-if="sales.length" cols="12">
+      <v-col v-if="salesStore.sales.length" cols="12">
         <v-card variant="tonal" color="primary">
           <v-card-title>Informe de ventas</v-card-title>
           <v-card-subtitle
-            >desde: {{ tsToDate(sales[0].checkoutTime)
-            }}<span v-if="sales.length > 1"> hasta:{{
-              tsToDate(sales[sales.length - 1].checkoutTime)
-            }}</span></v-card-subtitle
+            >desde: {{ tsToDate(salesStore.sales[0].checkoutTime)
+            }}<span v-if="salesStore.sales.length > 1">
+              >> hasta:{{
+                tsToDate(
+                  salesStore.sales[salesStore.sales.length - 1].checkoutTime
+                )
+              }}</span
+            ></v-card-subtitle
           >
           <v-divider></v-divider>
           <v-card-text class="pa-0">
             <v-list>
               <v-list-item title="Total">
-                <template v-slot:append> {{$globals.currency}}{{ totalProfit }}</template>
+                <template v-slot:append>
+                  {{ $globals.currency }}{{ totalProfit }}</template
+                >
               </v-list-item>
             </v-list>
             <v-divider></v-divider>
@@ -46,9 +52,8 @@
               >
                 <v-list-item-title>{{ key }}</v-list-item-title>
                 <template v-slot:append>
-                  x{{ value.totalQuantity }} => {{$globals.currency}}{{
-                    value.totalPrice
-                  }}</template
+                  x{{ value.totalQuantity }} => {{ $globals.currency
+                  }}{{ value.totalPrice }}</template
                 >
               </v-list-item>
             </v-list>
@@ -62,16 +67,15 @@
                   getProductById(key).name
                 }}</v-list-item-title>
                 <template v-slot:append>
-                  x{{ value.totalQuantity }} => {{$globals.currency}}{{
-                    value.totalPrice
-                  }}</template
+                  x{{ value.totalQuantity }} => {{ $globals.currency
+                  }}{{ value.totalPrice }}</template
                 >
               </v-list-item>
             </v-list>
             <v-list density="compact">
               <v-divider></v-divider>
               <v-list-item
-                v-for="sale in sales"
+                v-for="sale in salesStore.sales"
                 :key="sale.id"
                 :title="tsToDate(sale.checkoutTime)"
                 @click="selectSale(sale)"
@@ -82,7 +86,9 @@
                   </v-avatar>
                 </template>
 
-                <template v-slot:append> {{$globals.currency}}{{ sale.checkoutPrice }} </template>
+                <template v-slot:append>
+                  {{ $globals.currency }}{{ sale.checkoutPrice }}
+                </template>
               </v-list-item>
             </v-list>
           </v-card-text>
@@ -102,9 +108,7 @@
       <v-card-subtitle>{{
         tsToDate(selectedSale.checkoutTime)
       }}</v-card-subtitle>
-      <v-card-subtitle>{{
-        selectedSale.userId
-      }}</v-card-subtitle>
+      <v-card-subtitle>{{ selectedSale.userId }}</v-card-subtitle>
       <v-card-text class="px-0">
         <div class="d-flex py-0 justify-space-between">
           <v-list-item density="compact">
@@ -113,7 +117,8 @@
 
           <v-list-item density="compact">
             <v-list-item-title
-              >{{$globals.currency}}{{ selectedSale.checkoutPrice }}</v-list-item-title
+              >{{ $globals.currency
+              }}{{ selectedSale.checkoutPrice }}</v-list-item-title
             >
           </v-list-item>
         </div>
@@ -129,9 +134,8 @@
             :title="getProductById(item.id).name"
           >
             <template v-slot:append
-              >{{ item.quantity }}x {{$globals.currency}}{{ item.price }} = {{$globals.currency}}{{
-                item.quantity * item.price
-              }}
+              >{{ item.quantity }}x {{ $globals.currency }}{{ item.price }} =
+              {{ $globals.currency }}{{ item.quantity * item.price }}
             </template>
           </v-list-item>
         </v-list>
@@ -188,10 +192,6 @@ export default {
         items: [],
       },
       dialog: false,
-      filteredSales: [],
-      sales: [],
-      salesReport: [],
-      products: [],
       reports: ["productos", "categorias"],
       reportMode: "productos",
       showDatePicker: false, // Initialize with an empty array
@@ -205,7 +205,7 @@ export default {
     totalItemsByCategory() {
       const totalsByCategory = {};
 
-      for (const sale of this.sales) {
+      for (const sale of this.salesStore.sales) {
         for (const item of sale.items) {
           if (!totalsByCategory[item.category]) {
             totalsByCategory[item.category] = {
@@ -224,7 +224,7 @@ export default {
     totalItemsByProduct() {
       const totalsByProduct = {};
 
-      for (const sale of this.sales) {
+      for (const sale of this.salesStore.sales) {
         for (const item of sale.items) {
           if (!totalsByProduct[item.id]) {
             totalsByProduct[item.id] = {
@@ -241,7 +241,7 @@ export default {
     },
     totalProfit() {
       let total = 0;
-      for (const sale of this.sales) {
+      for (const sale of this.salesStore.sales) {
         total += sale.checkoutPrice;
       }
       return total;
@@ -254,24 +254,6 @@ export default {
     },
   },
   watch: {
-    "productStore.products": {
-      handler(newValue, oldValue) {
-        this.products.splice(0, this.products.length, ...newValue);
-      },
-      immediate: true, // Immediately trigger the handler with the current value
-    },
-    "salesStore.sales": {
-      handler(newValue, oldValue) {
-        this.sales.splice(0, this.sales.length, ...newValue);
-      },
-      immediate: true, // Immediately trigger the handler with the current value
-    },
-    "salesStore.salesReport": {
-      handler(newValue, oldValue) {
-        this.sales.splice(0, this.sales.length, ...newValue);
-      },
-      immediate: true, // Immediately trigger the handler with the current value
-    },
     dates: {
       handler(v, oldV) {
         if (v.length > 1) {
@@ -284,6 +266,7 @@ export default {
         } else if (v.length == 1) {
           this.dateRange = [v[0]];
         }
+        console.log(this.dateRange);
       },
     },
   },
@@ -293,8 +276,10 @@ export default {
   },
   methods: {
     getProductById(id) {
-      const index = this.products.findIndex((product) => product.id === id);
-      return this.products[index];
+      const index = this.productStore.products.findIndex(
+        (product) => product.id === id
+      );
+      return this.productStore.products[index];
     },
     tsToDate(timestamp) {
       const milliseconds = timestamp.toMillis();
@@ -304,10 +289,17 @@ export default {
     },
     fetchSalesReport() {
       let startDate = new Date(this.dateRange[0]);
-      let endDate = new Date(this.dateRange[1]
-        ? this.dateRange[1].setDate(this.dateRange[1].getDate() + 1)
-        : this.dateRange[0].setDate(this.dateRange[0].getDate() + 1));
-      this.salesStore.fetchSalesReport(startDate, endDate);
+      let endDate = new Date(
+        this.dateRange[1]
+          ? this.dateRange[1].setDate(this.dateRange[1].getDate() + 1)
+          : this.dateRange[0].setDate(this.dateRange[0].getDate() + 1)
+      );
+      console.log("start and end dates: ",startDate, endDate);
+
+      this.salesStore.cancelSubsctription();
+      
+      this.salesStore.fetchSales(startDate, endDate);
+      
       this.dates = [];
       this.dateRange = [];
       this.showDatePicker = false;

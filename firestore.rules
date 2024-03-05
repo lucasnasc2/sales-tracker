@@ -1,19 +1,16 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow access to all documents to authenticated users
-    match /{document=**} {
-      allow read, write: if request.auth != null;
-    }
-    
     // Allow only users with admin claim to create or delete products
     match /products/{productId} {
-      allow create, delete: if request.auth != null && request.auth.token.admin == true;
+      allow create, delete, update: if request.auth != null && request.auth.token.admin == true;
+      allow read: if request.auth != null
     }
 
     // Restrict deletion of sales
     match /sales/{saleId} {
-      allow delete: if false;
+      allow delete, update: if false;
+      allow read, create: if request.auth != null
     }
   }
 }

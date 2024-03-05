@@ -20,8 +20,9 @@
       </v-list-item>
     </v-list>
   </v-navigation-drawer>
-
+<div class="text-overline px-4 mt-2">{{modeStore.mode}}</div>
   <v-main class="custom-main">
+    
     <SellerMode v-if="modeStore.mode == 'seller'" />
     <ManageMode v-if="modeStore.mode == 'manage'" />
     <ReportsMode v-if="modeStore.mode == 'reports'" />
@@ -61,6 +62,6 @@ export default defineComponent({
 </script>
 <style scoped>
 .custom-main {
-  --v-layout-top: 20px !important;
+  --v-layout-top: 0px !important;
 }
 </style>

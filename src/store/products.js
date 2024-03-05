@@ -26,15 +26,24 @@ export const useProductStore = defineStore("product", {
   //   userLoggedIn: (state) => !!state.user,
   // },
   actions: {
+    cancelSubsctription() {
+      if (this.productsSubscription) {
+        this.productsSubscription();
+        this.productsSubscription = null;
+      }
+    },
     async addToFirestore(product) {
+      const alertStore = useAlertStore();
       try {
         const docRef = await addDoc(collection(db, "products"), product);
         console.log("Document written with ID: ", docRef.id);
       } catch (error) {
-        alert("error:", error);
+        alertStore.setAlert(error, "error", 5);
+        console.log(error);
       }
     },
     async updateFirestore(product) {
+      const alertStore = useAlertStore();
       try {
         let item = JSON.parse(JSON.stringify(product));
         delete item.id;
@@ -42,14 +51,17 @@ export const useProductStore = defineStore("product", {
         await setDoc(productRef, { ...item }, { merge: true });
         console.log("document updated");
       } catch (error) {
-        alert("error:", error)
+        alertStore.setAlert(error, "error", 5);
+        console.log(error);
       }
     },
     async deleteFirestore(product) {
+      const alertStore = useAlertStore();
       try {
         await deleteDoc(doc(db, "products", product.id));
       } catch (error) {
-        alert("error:", error);
+        alertStore.setAlert(error, "error", 5);
+        console.log(error);
       }
     },
     async fetchProducts() {
@@ -63,8 +75,8 @@ export const useProductStore = defineStore("product", {
           console.log(doc.id);
           let product = {
             id: doc.id,
-            ...doc.data()
-          }
+            ...doc.data(),
+          };
           products.push(product);
         });
         this.products = products; // Update store state with fetched products
@@ -73,7 +85,6 @@ export const useProductStore = defineStore("product", {
 
       // Optionally return the unsubscribe function if needed
       this.productsSubscription = unsubscribe;
-      
     },
   },
 });

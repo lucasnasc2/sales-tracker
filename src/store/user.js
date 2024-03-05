@@ -48,12 +48,10 @@ export const useUserStore = defineStore("user", {
       const alertStore = useAlertStore();
       const productStore = useProductStore();
       const salesStore = useSalesStore();
-      if (productStore.productsSubscription) {
-        productStore.productsSubscription();
-      }
-      if (salesStore.salesSubscription) {
-        salesStore.salesSubscription();
-      }
+
+        productStore.cancelSubsctription();
+        salesStore.cancelSubsctription();
+        
       signOut(auth)
         .then(() => {
           router.push("login");

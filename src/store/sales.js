@@ -31,6 +31,12 @@ export const useSalesStore = defineStore("sales", {
   //   userLoggedIn: (state) => !!state.user,
   // },
   actions: {
+    cancelSubsctription() {
+      if(this.salesSubscription) {
+        this.salesSubscription()
+        this.salesSubscription = null
+      }
+    },
     async addToFirestore(sale) {
       const userStore = useUserStore();
       try {
@@ -84,7 +90,7 @@ export const useSalesStore = defineStore("sales", {
           };
           sales.push(sale);
         });
-        this.sales = sales;
+        this.sales = sales
         console.log(this.sales);
       });
 
