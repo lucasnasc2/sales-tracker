@@ -18,8 +18,8 @@ This app is not meant to be used profesionally.
 
 ## Clone and configure
 - Clone this repository into our machine and using Node and NPM, install the dependencies. Run `npm install` on the root folder. 
-- On the root folter, create a .env.local file
-- Also on the root folder, find the file globalConfig.js and edit the name of your organization, the color and your currency.
+- Also on the root folder, find the file `.env` and edit the name of your organization, the color and your currency. [See how to configure the colors](#configuring)
+- lastly, on the root folter, create a `.env.local` file (for firebase credentials)
 
 ## Firebase backend/hosting
 This app is built with the firebase suit. It includes a noSql database, authentication and hosting.
@@ -53,7 +53,7 @@ install de sdk:
 Login into firebase:
 `firebase login`
 
-On the root folder, edit your .firebaserc file to include your project id.
+On the root folder, edit your `.firebaserc` file to include your project id.
 ```
 {
   "projects": {
@@ -65,4 +65,48 @@ On the root folder, edit your .firebaserc file to include your project id.
 ### Build and deploy:
 Use `npm run build` to build your app, then `firebase deploy` to deploy your app to firebase hosting. Lastly, run `firebase deploy --only firestore:rules` to update your firestore rules with the preconfigured ones.
 
+## Extras
+### Setting the color on the .env file:
+To change the color (`VITE_THEME_COLOR`), use the following syntax: `color.variation` Eg.: `pink.accent1`
+Down below are the supported colors and below that are the supported variations
+You can also use Hex values.
+Click the link to see the entire color palette: [Vuetify Material olors](https://vuetifyjs.com/en/styles/colors/#material-colors)
+
+COLORS:
+red
+pink
+purple
+deepPurple
+indigo
+blue
+lightBlue
+cyan
+teal
+green
+lightGreen
+lime
+yellow
+amber
+orange
+deepOrange
+brown
+blueGrey
+grey
+shades
+
+VARIATIONS:
+accent1
+accent2
+accent3
+accent4
+base
+darken1
+darken2
+darken3
+darken4
+lighten1
+lighten2
+lighten3
+lighten4
+lighten5
 
