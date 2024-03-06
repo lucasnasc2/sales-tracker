@@ -37,6 +37,7 @@
   </v-card>
   <input
     type="file"
+    accept="image/*"
     ref="fileInput"
     style="display: none"
     @change="handleFileInputChange"

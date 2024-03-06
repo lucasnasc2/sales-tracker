@@ -2,16 +2,11 @@
   <v-container class="pa-0">
     <!-- Chips for filtering -->
     <div class="px-2">
-      <v-chip-group column>
-        <v-chip filter class="mx-1" v-for="(category, index) in categoryOptions" :key="index"
-          @click="toggleFilterByCategory(category)">
-          {{ category }}
-        </v-chip>
-      </v-chip-group>
+      <CategoryFilter :items="categoryOptions" @selected="toggleFilterByCategory"></CategoryFilter>
     </div>
 
     <!-- Grid of square cards -->
-    <ProductGrid :items="filteredItems" @selected="editItem"></ProductGrid>
+    <ProductGrid :items="filteredItems" :categories="categoryOptions" @selected="editItem"></ProductGrid>
 
     <!-- Popup dialog -->
     <v-dialog v-model="dialog" max-width="500">

@@ -1,20 +1,8 @@
 <template>
   <div class="px-3 pb-2">
-    <v-chip-group
-      :disabled="!salesStore.sales.length"
-      v-model="reportMode"
-      mandatory
-      column
-    >
-      <v-chip
-        color="primary"
-        filter
-        class="mx-1"
-        :value="report"
-        v-for="(report, index) in reports"
-        :key="index"
-        @click="changeReport(report)"
-      >
+    <v-chip-group :disabled="!salesStore.sales.length" v-model="reportMode" mandatory column>
+      <v-chip color="primary" filter class="mx-1" :value="report" v-for="(report, index) in reports" :key="index"
+        @click="changeReport(report)">
         {{ report }}
       </v-chip>
     </v-chip-group>
@@ -24,62 +12,47 @@
       <v-col v-if="salesStore.sales.length" cols="12">
         <v-card variant="tonal" color="primary">
           <v-card-title>Informe de ventas</v-card-title>
-          <v-card-subtitle
-            >desde: {{ tsToDate(salesStore.sales[0].checkoutTime)
+          <v-card-subtitle>desde: {{ tsToDate(salesStore.sales[0].checkoutTime)
             }}<span v-if="salesStore.sales.length > 1">
               >> hasta:{{
-                tsToDate(
-                  salesStore.sales[salesStore.sales.length - 1].checkoutTime
-                )
-              }}</span
-            ></v-card-subtitle
-          >
+      tsToDate(
+        salesStore.sales[salesStore.sales.length - 1].checkoutTime
+      )
+    }}</span></v-card-subtitle>
           <v-divider></v-divider>
           <v-card-text class="pa-0">
             <v-list>
               <v-list-item title="Total">
                 <template v-slot:append>
-                  {{ $globals.currency }}{{ totalProfit }}</template
-                >
+                  {{ $globals.currency }}{{ totalProfit }}</template>
               </v-list-item>
             </v-list>
             <v-divider></v-divider>
             <v-list v-if="reportMode == 'categorias'">
-              <v-list-item
-                v-for="(value, key) in totalItemsByCategory"
-                :key="key"
-                density="compact"
-              >
+              <v-list-item v-for="(value, key) in totalItemsByCategory" :key="key" density="compact">
                 <v-list-item-title>{{ key }}</v-list-item-title>
+
                 <template v-slot:append>
                   x{{ value.totalQuantity }} => {{ $globals.currency
-                  }}{{ value.totalPrice }}</template
-                >
+                  }}{{ value.totalPrice }}</template>
               </v-list-item>
             </v-list>
             <v-list v-if="reportMode == 'productos'">
-              <v-list-item
-                v-for="(value, key) in totalItemsByProduct"
-                :key="key"
-                density="compact"
-              >
+              <v-list-item v-for="(value, key) in totalItemsByProduct" :key="key" density="compact">
                 <v-list-item-title>{{
-                  getProductById(key).name
-                }}</v-list-item-title>
+      getProductById(key).name
+    }}</v-list-item-title>
+
                 <template v-slot:append>
                   x{{ value.totalQuantity }} => {{ $globals.currency
-                  }}{{ value.totalPrice }}</template
-                >
+                  }}{{ value.totalPrice }}</template>
               </v-list-item>
             </v-list>
             <v-list density="compact">
               <v-divider></v-divider>
-              <v-list-item
-                v-for="sale in salesStore.sales"
-                :key="sale.id"
-                :title="tsToDate(sale.checkoutTime)"
-                @click="selectSale(sale)"
-              >
+              <v-list-item v-for="sale in salesStore.sales" :key="sale.id" :title="tsToDate(sale.checkoutTime)"
+                @click="selectSale(sale)">
+
                 <template v-slot:prepend>
                   <v-avatar color="grey-lighten-1">
                     <v-icon color="white">mdi-receipt-text</v-icon>
@@ -106,8 +79,8 @@
     <v-card>
       <v-card-title>Venta {{ selectedSale.id }}</v-card-title>
       <v-card-subtitle>{{
-        tsToDate(selectedSale.checkoutTime)
-      }}</v-card-subtitle>
+      tsToDate(selectedSale.checkoutTime)
+    }}</v-card-subtitle>
       <v-card-subtitle>{{ selectedSale.userId }}</v-card-subtitle>
       <v-card-text class="px-0">
         <div class="d-flex py-0 justify-space-between">
@@ -116,10 +89,8 @@
           </v-list-item>
 
           <v-list-item density="compact">
-            <v-list-item-title
-              >{{ $globals.currency
-              }}{{ selectedSale.checkoutPrice }}</v-list-item-title
-            >
+            <v-list-item-title>{{ $globals.currency
+              }}{{ selectedSale.checkoutPrice }}</v-list-item-title>
           </v-list-item>
         </div>
 
@@ -127,14 +98,11 @@
         <v-list lines="two">
           <v-list-subheader>Productos</v-list-subheader>
 
-          <v-list-item
-            v-for="item in selectedSale.items"
-            :key="item.id"
-            :subtitle="getProductById(item.id).category"
-            :title="getProductById(item.id).name"
-          >
-            <template v-slot:append
-              >{{ item.quantity }}x {{ $globals.currency }}{{ item.price }} =
+          <v-list-item v-for="item in selectedSale.items" :key="item.id" :subtitle="getProductById(item.id).description"
+            :title="getProductById(item.id).name">
+            <v-list-item-subtitle>{{ getProductById(item.id).category }}</v-list-item-subtitle>
+
+            <template v-slot:append>{{ item.quantity }}x {{ $globals.currency }}{{ item.price }} =
               {{ $globals.currency }}{{ item.quantity * item.price }}
             </template>
           </v-list-item>
@@ -145,13 +113,8 @@
 
   <v-dialog v-model="showDatePicker" max-width="328">
     <v-card>
-      <v-date-picker
-        multiple
-        v-model="dates"
-        color="primary"
-        :max="todaysDateString"
-        show-adjacent-months
-      ></v-date-picker>
+      <v-date-picker multiple v-model="dates" color="primary" :max="todaysDateString"
+        show-adjacent-months></v-date-picker>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn @click="fetchSalesReport">Consultar</v-btn>
@@ -160,12 +123,7 @@
   </v-dialog>
 
   <div style="position: fixed; bottom: 20px; right: 20px">
-    <v-btn
-      icon="mdi-calendar"
-      size="x-large"
-      color="primary"
-      @click="showDatePicker = true"
-    ></v-btn>
+    <v-btn icon="mdi-calendar" size="x-large" color="primary" @click="showDatePicker = true"></v-btn>
   </div>
 </template>
 
@@ -294,12 +252,12 @@ export default {
           ? this.dateRange[1].setDate(this.dateRange[1].getDate() + 1)
           : this.dateRange[0].setDate(this.dateRange[0].getDate() + 1)
       );
-      console.log("start and end dates: ",startDate, endDate);
+      console.log("start and end dates: ", startDate, endDate);
 
       this.salesStore.cancelSubsctription();
-      
+
       this.salesStore.fetchSales(startDate, endDate);
-      
+
       this.dates = [];
       this.dateRange = [];
       this.showDatePicker = false;
