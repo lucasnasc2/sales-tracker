@@ -1,28 +1,63 @@
 <template>
-  <v-app-bar color="primary" :title="$globals.organizationName">
+  <v-app-bar color="primary">
     <template v-slot:prepend>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
     </template>
-    <v-btn icon v-on:click="logout">
-      <v-icon>mdi-logout</v-icon>
-    </v-btn>
+    <template v-slot:append>
+      <v-btn
+        class="searchBtn"
+        icon="mdi-magnify"
+        @click="
+          searchStore.state ? searchStore.close() : (searchStore.state = true)
+        "
+      ></v-btn>
+    </template>
+    <v-app-bar-title v-if="!searchStore.state">
+      {{ $globals.organizationName }}
+    </v-app-bar-title>
+    <v-text-field
+      v-model="searchStore.text"
+      @focusout="onFocusout"
+      v-if="searchStore.state"
+      hide-details
+      single-line
+      autofocus
+      density="compact"
+      variant="solo"
+      rounded
+    ></v-text-field>
   </v-app-bar>
   <v-navigation-drawer v-model="drawer" location="left">
     <v-list color="primary">
-      <v-list-item :active="modeStore.mode == 'seller'" v-on:click="modeStore.changeMode('seller')">
+      <v-list-item
+        :active="modeStore.mode == 'seller'"
+        v-on:click="modeStore.changeMode('seller')"
+      >
         <v-list-item-title>Vender</v-list-item-title>
       </v-list-item>
-      <v-list-item :active="modeStore.mode == 'manage'" v-on:click="modeStore.changeMode('manage')">
+      <v-list-item
+        :active="modeStore.mode == 'manage'"
+        v-on:click="modeStore.changeMode('manage')"
+      >
         <v-list-item-title>Gestionar</v-list-item-title>
       </v-list-item>
-      <v-list-item :active="modeStore.mode == 'reports'" v-on:click="modeStore.changeMode('reports')">
+      <v-list-item
+        :active="modeStore.mode == 'reports'"
+        v-on:click="modeStore.changeMode('reports')"
+      >
         <v-list-item-title>Informes</v-list-item-title>
       </v-list-item>
     </v-list>
+    <template v-slot:append>
+      <div class="pa-2">
+        <v-btn block append-icon="mdi-logout" v-on:click="logout">
+          logout
+        </v-btn>
+      </div>
+    </template>
   </v-navigation-drawer>
-<div class="text-overline px-4 mt-2">{{modeStore.mode}}</div>
+  <div class="text-overline px-4 mt-2">{{ modeStore.mode }}</div>
   <v-main class="custom-main">
-    
     <SellerMode v-if="modeStore.mode == 'seller'" />
     <ManageMode v-if="modeStore.mode == 'manage'" />
     <ReportsMode v-if="modeStore.mode == 'reports'" />
@@ -34,7 +69,7 @@ import { defineComponent } from "vue";
 import { mapStores } from "pinia";
 import { useModeStore } from "@/store/modes.js";
 import { useUserStore } from "@/store/user";
-
+import { useSearchStore } from "@/store/search";
 
 export default defineComponent({
   name: "Home",
@@ -44,18 +79,24 @@ export default defineComponent({
     };
   },
   computed: {
-    ...mapStores(useModeStore, useUserStore),
+    ...mapStores(useModeStore, useUserStore, useSearchStore),
   },
   watch: {
     "modeStore.mode": {
       handler() {
-        this.drawer = false
-      }
+        this.drawer = false;
+      },
     },
   },
   methods: {
     logout() {
-      this.userStore.logout()
+      this.userStore.logout();
+    },
+    onFocusout(v) {
+      console.log(v);
+      if (v.relatedTarget && v.relatedTarget.className.includes("searchBtn"))
+        return;
+      this.searchStore.close()
     },
   },
 });
@@ -63,5 +104,13 @@ export default defineComponent({
 <style scoped>
 .custom-main {
   --v-layout-top: 0px !important;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

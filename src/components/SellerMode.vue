@@ -2,19 +2,35 @@
   <v-container class="pa-0">
     <!-- Chips for filtering -->
     <div class="px-2">
-      <CategoryFilter :items="categoryOptions" @selected="toggleFilterByCategory"></CategoryFilter>
+      <CategoryFilter
+        :items="categoryOptions"
+        @selected="toggleFilterByCategory"
+      ></CategoryFilter>
     </div>
 
     <!-- Grid of square cards -->
-    <ProductGrid :items="filteredItems" :gategories="categoryOptions" @selected="showDetails"></ProductGrid>
+    <ProductGrid
+      :items="searchedItems"
+      :categories="categoryOptions"
+      @selected="showDetails"
+    ></ProductGrid>
 
     <!-- Popup dialog for product details -->
     <v-dialog v-model="dialog" max-width="500">
       <v-card>
         <v-list lines="two">
-          <v-list-item density="compact" :subtitle="selectedItem.description" :title="selectedItem.name">
-            <v-list-item-subtitle>{{selectedItem.category}}</v-list-item-subtitle>
-            <template v-slot:append>{{ quantity }}x {{ $globals.currency }}{{ selectedItem.price * quantity }} </template>
+          <v-list-item
+            density="compact"
+            :subtitle="selectedItem.description"
+            :title="selectedItem.name"
+          >
+            <v-list-item-subtitle>{{
+              selectedItem.category
+            }}</v-list-item-subtitle>
+            <template v-slot:append
+              >{{ quantity }}x {{ $globals.currency
+              }}{{ selectedItem.price * quantity }}
+            </template>
           </v-list-item>
         </v-list>
         <v-divider></v-divider>
@@ -27,13 +43,15 @@
               </v-btn>
             </v-col>
             <v-col class="text-center" cols="4">
-              <div style="
+              <div
+                style="
                   display: flex;
                   align-items: center;
                   justify-content: center;
                   height: 100%;
                   width: 100%;
-                ">
+                "
+              >
                 <v-text-field v-model="quantity" number></v-text-field>
               </div>
             </v-col>
@@ -49,7 +67,9 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn @click="dialog = false">Close</v-btn>
-          <v-btn color="primary" @click="addItemToCart(selectedItem)">Add to Cart</v-btn>
+          <v-btn color="primary" @click="addItemToCart(selectedItem)"
+            >Add to Cart</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -72,17 +92,26 @@
             </template>
           </v-list-item>
           <v-divider></v-divider>
-          <v-list-item density="compact" class="pa-2" v-for="(cartItem, index) in cart" :key="index">
+          <v-list-item
+            density="compact"
+            class="pa-2"
+            v-for="(cartItem, index) in cart"
+            :key="index"
+          >
             <v-list-item-title>{{
-          getProductById(cartItem.id).name
-        }}</v-list-item-title>
-        <v-list-item-subtitle>{{getProductById(cartItem.id).description}}</v-list-item-subtitle>
-        <v-list-item-subtitle>{{getProductById(cartItem.id).category}}</v-list-item-subtitle>
+              getProductById(cartItem.id).name
+            }}</v-list-item-title>
+            <v-list-item-subtitle>{{
+              getProductById(cartItem.id).description
+            }}</v-list-item-subtitle>
+            <v-list-item-subtitle>{{
+              getProductById(cartItem.id).category
+            }}</v-list-item-subtitle>
 
             <template v-slot:append>
-              {{ cartItem.quantity }} x {{ $globals.currency }}{{ cartItem.price }} = {{ $globals.currency }}{{
-          cartItem.quantity * cartItem.price
-        }}
+              {{ cartItem.quantity }} x {{ $globals.currency
+              }}{{ cartItem.price }} = {{ $globals.currency
+              }}{{ cartItem.quantity * cartItem.price }}
               <v-btn flat icon="mdi-delete" @click="removeItemFromCart(index)">
               </v-btn>
             </template>
@@ -95,9 +124,19 @@
   <!-- Fixed button with cart icon -->
 
   <div style="position: fixed; bottom: 20px; right: 20px">
-    <v-btn icon size="x-large" color="primary" @click="toggleCartDialog" :disabled="cart.length === 0">
+    <v-btn
+      icon
+      size="x-large"
+      color="primary"
+      @click="toggleCartDialog"
+      :disabled="cart.length === 0"
+    >
       <v-icon>mdi-cart</v-icon>
-      <v-badge v-if="cart.length >= 1" :content="totalQuantityInCart" overlap></v-badge>
+      <v-badge
+        v-if="cart.length >= 1"
+        :content="totalQuantityInCart"
+        overlap
+      ></v-badge>
     </v-btn>
   </div>
 </template>
@@ -106,12 +145,11 @@
 import { mapStores } from "pinia";
 import { useProductStore } from "@/store/products.js";
 import { useSalesStore } from "@/store/sales.js";
+import { useSearchStore } from "@/store/search.js";
 export default {
   data() {
     return {
-      items: [],
       filteredCategory: "",
-      filteredItems: [],
       selectedItem: {},
       dialog: false,
       cartDialog: false,
@@ -120,9 +158,22 @@ export default {
     };
   },
   computed: {
-    ...mapStores(useProductStore, useSalesStore),
+    ...mapStores(useProductStore, useSalesStore, useSearchStore),
     categoryOptions() {
-      return [...new Set(this.items.map((item) => item.category))];
+      let categories = [
+        ...new Set(this.productStore.products.map((item) => item.category)),
+      ];
+      return categories;
+    },
+    filteredItems() {
+      return this.productStore.products.filter((item) =>
+        !!this.filteredCategory ? this.filteredCategory == item.category : true
+      );
+    },
+    searchedItems() {
+      return this.filteredItems.filter((item) =>
+        !!this.searchStore.text ? item.name.includes(this.searchStore.text) : true
+      );
     },
     totalQuantityInCart() {
       return this.cart.reduce((total, item) => total + item.quantity, 0);
@@ -135,21 +186,14 @@ export default {
   },
   mounted() {
     this.productStore.fetchProducts();
-    this.filteredItems = this.items;
   },
-  watch: {
-    "productStore.products": {
-      handler(newValue, oldValue) {
-        this.items.splice(0, this.items.length, ...newValue);
-        this.filterItems();
-      },
-      immediate: true, // Immediately trigger the handler with the current value
-    },
-  },
+  watch: {},
   methods: {
     getProductById(id) {
-      const index = this.items.findIndex((product) => product.id === id);
-      return this.items[index];
+      const index = this.productStore.products.findIndex(
+        (product) => product.id === id
+      );
+      return this.productStore.products[index];
     },
     toggleFilterByCategory(category) {
       if (
@@ -160,12 +204,6 @@ export default {
       } else if (this.filteredCategory == category) {
         this.filteredCategory = "";
       }
-      this.filterItems();
-    },
-    filterItems() {
-      this.filteredItems = this.items.filter((item) =>
-        !!this.filteredCategory ? this.filteredCategory == item.category : true
-      );
     },
     showDetails(item) {
       this.selectedItem = item;

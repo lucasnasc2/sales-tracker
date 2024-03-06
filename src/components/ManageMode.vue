@@ -6,7 +6,7 @@
     </div>
 
     <!-- Grid of square cards -->
-    <ProductGrid :items="filteredItems" :categories="categoryOptions" @selected="editItem"></ProductGrid>
+    <ProductGrid :items="searchedItems" :categories="categoryOptions" @selected="editItem"></ProductGrid>
 
     <!-- Popup dialog -->
     <v-dialog v-model="dialog" max-width="500">
@@ -45,12 +45,11 @@
 <script>
 import { mapStores } from "pinia";
 import { useProductStore } from "@/store/products.js";
+import { useSearchStore } from "@/store/search.js";
 
 export default {
   data() {
     return {
-      items: [],
-      filteredItems: [],
       filteredCategory: "",
       editedItem: {
         name: "",
@@ -66,23 +65,25 @@ export default {
     };
   },
   computed: {
-    ...mapStores(useProductStore),
+    ...mapStores(useProductStore, useSearchStore),
     categoryOptions() {
-      return [...new Set(this.items.map((item) => item.category))];
+      return [...new Set(this.productStore.products.map((item) => item.category))];
+    },
+    filteredItems() {
+      return this.productStore.products.filter((item) =>
+        !!this.filteredCategory ? this.filteredCategory == item.category : true
+      );
+    },
+    searchedItems() {
+      return this.filteredItems.filter((item) =>
+        !!this.searchStore.text ? item.name.includes(this.searchStore.text) : true
+      );
     },
   },
   mounted() {
     this.productStore.fetchProducts();
-    this.filteredItems = this.items;
   },
   watch: {
-    "productStore.products": {
-      handler(newValue, oldValue) {
-        this.items.splice(0, this.items.length, ...newValue);
-        this.filterItems();
-      },
-      immediate: true, // Immediately trigger the handler with the current value
-    },
   },
   methods: {
     toggleFilterByCategory(category) {
@@ -94,12 +95,6 @@ export default {
       } else if (this.filteredCategory == category) {
         this.filteredCategory = "";
       }
-      this.filterItems();
-    },
-    filterItems() {
-      this.filteredItems = this.items.filter((item) =>
-        !!this.filteredCategory ? this.filteredCategory == item.category : true
-      );
     },
     handleImageUploaded(compressedImage) {
       this.editedItem.img = compressedImage
