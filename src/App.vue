@@ -4,16 +4,19 @@
       <RouterView />
     </v-main>
     <AlertSnackbar></AlertSnackbar>
+    <LoaderOverlay v-if="loaderStore.state"></LoaderOverlay>
   </v-app>
 </template>
 
 <script>
-
+import { mapStores } from 'pinia';
+import { useLoaderStore } from './store/loader';
 export default {
   data() {
     return {};
   },
   computed: {
+    ...mapStores(useLoaderStore)
   },
   mounted() {
     

@@ -169,10 +169,19 @@
 
   <div style="position: fixed; bottom: 20px; right: 20px">
     <v-btn
+      elevation="5"
       icon="mdi-calendar"
       size="x-large"
       color="primary"
       @click="showDatePicker = true"
+    ></v-btn>
+  </div>
+  <div style="position: fixed; bottom: 20px; left: 20px">
+    <v-btn
+      icon="mdi-file-download-outline"
+      color="primary"
+      :disabled="!salesStore.sales.length"
+      @click="downloadExcel"
     ></v-btn>
   </div>
 </template>
@@ -181,6 +190,9 @@
 import { mapStores } from "pinia";
 import { useProductStore } from "@/store/products.js";
 import { useSalesStore } from "@/store/sales.js";
+import { useAlertStore } from "@/store/alerts";
+import { useLoaderStore } from "@/store/loader.js";
+import { generateExcel } from "@/plugins/getExcel.js";
 const todaysDate = new Date();
 todaysDate.setHours(0, 0, 0, 0);
 
@@ -206,7 +218,7 @@ export default {
     };
   },
   computed: {
-    ...mapStores(useProductStore, useSalesStore),
+    ...mapStores(useProductStore, useSalesStore, useAlertStore, useLoaderStore),
     formattedSelectedDate() {
       return new Date(this.selectedDate).toLocaleDateString();
     },
@@ -368,6 +380,30 @@ export default {
       }
 
       this.dates = resultArray;
+    },
+    async downloadExcel() {
+      try {
+        if (confirm("Descargar informe en formato .xlsx?")) {
+          this.loaderStore.state = true;
+          // Assuming salesData and productsData are available in your component
+          const excelBlob = await generateExcel(
+            this.salesStore.sales,
+            this.productStore.products
+          );
+          const url = window.URL.createObjectURL(excelBlob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "sales_data.xlsx");
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          this.loaderStore.state = false;
+        }
+      } catch (error) {
+        console.log(error);
+        this.loaderStore.state = false;
+        this.alertStore.setAlert(error, "error", 7);
+      }
     },
   },
 };
