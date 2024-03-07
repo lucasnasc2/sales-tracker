@@ -1,7 +1,7 @@
 <template>
   <v-app-bar :title="$globals.organizationName">
     <template v-slot:prepend>
-      <v-icon>$globals.organizationIcon</v-icon>
+      <v-icon>{{$globals.organizationIcon}}</v-icon>
     </template>
   </v-app-bar>
   <v-main class="custom-main">

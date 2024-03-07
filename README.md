@@ -136,6 +136,7 @@ const product = {
   name: string, //Product name
   description: string, //Product description
   category: string, //Product category
+  img: string, //base64 image string
   price: number, //Product price
   stock: number, //This property is here for future implementation
   active: boolean, //This Property is here for future implementation
