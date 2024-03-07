@@ -58,7 +58,7 @@ Login into firebase:
 `firebase login`
 
 On the root folder, edit your `.firebaserc` file to include your project id.
-```
+```json
 {
   "projects": {
     "default": "your-project-id"
@@ -67,8 +67,10 @@ On the root folder, edit your `.firebaserc` file to include your project id.
 ```
 ### Development
 If you wanna se the app in development mode in you local machine, you can deploy the Vite development server, to run the frontend and see changes in realtime, and the Firebase emulator suit, to run an emulated version of firebase, with authentication and firestore database. The Firebase emulator comes with a neat interface in which you can create users and set the custom claims necessary for the app to work.
-1 To spin the dev server `npm run dev` on your root folder.
-2 in another terminal tab, spin the Firebase emulator `firebase emulators:start`.
+
+1. To spin the dev server `npm run dev` on your root folder.
+2. in another terminal tab, spin the Firebase emulator `firebase emulators:start`.
+
 In both cases, the terminal will tell you in which port these services are running.
 
 ### Build and deploy:
@@ -128,7 +130,7 @@ The systax for the icon is `mdi-icon-name`.
 ## Data structures
 ### Products:
 Products is a collection of product objects with the following structure:
-```
+```javascript
 const product = {
   id: firebaseId, //id asigned by firebase when document is created.
   name: string, //Product name
@@ -141,7 +143,7 @@ const product = {
 ```
 ### Sales:
 Sales is a collection of sale objects with the following structure:
-```
+```javascript
 const sale = {
   id: firebaseId, //id asigned by firebase when document is created.
   checkoutTime: firebase timestamp, //timestamp created by firebase when document is created. It have some methods of it's own. Consult firebase docs for more info.
