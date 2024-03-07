@@ -6,6 +6,7 @@ This app will assist you in the sales process. It lets you register products, re
 - Add items to cart.
 - Checkout cart and update database with a new sale.
 - Get reports by day with a totals by product, category and overall.
+- Export sales reports as excel spreadsheet.
 - Keeping track of your stock (some time in the future)
 - Apply discounts (some time in the future)
 
