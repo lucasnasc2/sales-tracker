@@ -170,8 +170,12 @@ For that you have to set a custom claim for this user. This can not be done in t
 
 ## Firebase Admin tool
 This tool was created to help set custom claim to a user with little configuration.
-- Navigate the `firebaseAdmin` folder and run `npm install` on the terminal.
-- Go back to the root folder and run `npm run setAdmin`.
+- First you will have to get your Firebase admin key on the firebase console (edit the link below to have the correct project ID):
+  - `https://console.firebase.google.com/u/0/project/YOUR-PROJECT-ID/settings/serviceaccounts/adminsdk`
+  - Alternatively you can navigate to you project console `project settings -> service accounts`
+  - Then you can generate a new private key. It's a Json file that should be stored locally, never upload this file in a public way. Whoever have access to your private key can control your whole project.
+- Place your private key in the firebaseAdmin folder, rename it to firebaseCredentials.json (add this file to your .gitignore so it won't accidentaly be leaked)
+- Open a new terminal on the root folder of your project and run `npm run setAdmin`.
 - It will prompt you to type a valid, existing user email. When you press `Enter` it should correctly create a custom claim on this user to make them an `admin`.
 
 
