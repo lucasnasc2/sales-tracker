@@ -66,7 +66,7 @@ On the root folder, edit your `.firebaserc` file to include your project id.
 }
 ```
 ### Development
-If you wanna se the app in development mode in you local machine, you can deploy the Vite development server, to run the frontend and see changes in realtime, and the Firebase emulator suit, to run an emulated version of firebase, with authentication and firestore database. The Firebase emulator comes with a neat interface in which you can create users and set the custom claims necessary for the app to work.
+If you wanna see the app in development mode in you local machine, you can run the Vite development server, for fronten, and see changes in realtime, and the Firebase emulator suit, for an emulated version of firebase, with authentication and firestore database. The Firebase emulator comes with a neat interface in which you can create users and set the custom claims necessary for the app to work.
 
 1. To spin the dev server `npm run dev` on your root folder.
 2. in another terminal tab, spin the Firebase emulator `firebase emulators:start`.
@@ -164,7 +164,7 @@ Look for the `firestore.rules` file to see the defaul configuration.
 Consult the Firestore rules documentation for more details.
 
 ## Custom claims
-Every user recently created in the firebase console have limited access in the app. They can not add, delete or edit products, only visualize them.
+Every user recently created in the firebase console will have limited access in the app. They can not add, delete or edit products, only visualize them.
 Only users with a custom claim of `admin` can have access to those functions.
 For that you have to set a custom claim for this user. This can not be done in the console or the app (for now), but in this project we have a subfolder called `firebaseAdmin` that contains a function to set `Admin` custom claim to a user.
 
