@@ -5,6 +5,7 @@
     </template>
     <template v-slot:append>
       <v-btn
+								v-if=" modeStore.mode != 'reports' "
         class="searchBtn"
         icon="mdi-magnify"
         @click="
@@ -12,13 +13,13 @@
         "
       ></v-btn>
     </template>
-    <v-app-bar-title v-if="!searchStore.state">
+    <v-app-bar-title v-if="!searchStore.state || modeStore.mode == 'reports'">
       {{ $globals.organizationName }}
     </v-app-bar-title>
     <v-text-field
       v-model="searchStore.text"
       @focusout="onFocusout"
-      v-if="searchStore.state"
+      v-if="searchStore.state && modeStore.mode != 'reports' "
       hide-details
       single-line
       autofocus
