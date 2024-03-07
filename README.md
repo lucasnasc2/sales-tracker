@@ -27,7 +27,7 @@ Vite, Vue 3, Vuetify 3.5 and Firebase are the main technologies being used in th
 
 ## Firebase backend/hosting
 This app is built with the firebase suit. It includes a noSql database, authentication and hosting.
-Each organization should create a firebase account, create a new project and connect it to the app.
+Each organization should create a firebase account, [create a new project](https://console.firebase.google.com/) and connect it to the app.
 
 ### API keys:
 To register your app, fill out the .env.local file like so:
