@@ -7,7 +7,7 @@
       <v-btn
 								v-if=" modeStore.mode != 'reports' "
         class="searchBtn"
-        icon="mdi-magnify"
+        :icon="searchStore.state ? 'mdi-close' : 'mdi-magnify'"
         @click="
           searchStore.state ? searchStore.close() : (searchStore.state = true)
         "
@@ -18,7 +18,6 @@
     </v-app-bar-title>
     <v-text-field
       v-model="searchStore.text"
-      @focusout="onFocusout"
       v-if="searchStore.state && modeStore.mode != 'reports' "
       hide-details
       single-line
@@ -92,12 +91,6 @@ export default defineComponent({
   methods: {
     logout() {
       this.userStore.logout();
-    },
-    onFocusout(v) {
-      console.log(v);
-      if (v.relatedTarget && v.relatedTarget.className.includes("searchBtn"))
-        return;
-      this.searchStore.close()
     },
   },
 });
