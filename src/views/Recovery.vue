@@ -14,13 +14,11 @@
       <v-row align="center" justify="center" class="fill-height">
         <v-col cols="12" sm="8" md="4">
           <v-card elevation="3">
-            <v-card-title class="text-center">Login</v-card-title>
+            <v-card-title class="text-center">Recuperar</v-card-title>
             <v-card-text>
-              <v-form @submit.prevent="login">
+              <v-form @submit.prevent="recover">
                 <v-text-field v-model="email" label="email" required outlined></v-text-field>
-                <v-text-field v-model="password" label="Password" type="password" required outlined></v-text-field>
-                <v-btn block type="submit" color="primary" >Login</v-btn>
-                <v-btn class="mt-3" block variant="tonal" size="x-small" @click="goToRecover">Recuperar contraseña</v-btn>
+                <v-btn type="submit" color="primary" block>Recuperar</v-btn>
               </v-form>
             </v-card-text>
           </v-card>
@@ -34,13 +32,11 @@
 import { defineComponent } from "vue";
 import { mapStores } from "pinia";
 import { useUserStore } from "@/store/user";
-import router from "@/router/index.js";
 
 export default defineComponent({
-  name: "Login",
+  name: "Recovery",
   data() {
     return {
-      password: "",
       email: "",
     };
   },
@@ -48,14 +44,11 @@ export default defineComponent({
     ...mapStores(useUserStore),
   },
   methods: {
-    login() {
-      this.userStore.login(this.email, this.password)
+    recover() {
+      this.userStore.recover(this.email)
     },
     goToGithub() {
       window.open('https://github.com/lucasnasc2/sales-tracker?tab=readme-ov-file#sales-tracker', '_blank')
-    },
-    goToRecover() {
-      router.push('/recovery')
     }
 
   },

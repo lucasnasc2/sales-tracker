@@ -43,9 +43,11 @@ router.beforeEach(async (to, from, next) => {
     });
   });
 
-  if (to.name === "Login" && isLoggedIn) {
+  const onLoggedOutPages = to.name === "Login" || to.name === "Recovery"
+  const notOnLoggedOutPages = to.name != "Login" && to.name != "Recovery"
+  if (onLoggedOutPages && isLoggedIn) {
     next({ name: "Home" }); // Redirect to Home if user is logged in and tries to access Login
-  } else if (to.name !== "Login" && !isLoggedIn) {
+  } else if (notOnLoggedOutPages && !isLoggedIn) {
     next({ name: "Login" }); // Redirect to Login if user is not logged in and tries to access other routes
   } else {
     next(); // Continue navigation

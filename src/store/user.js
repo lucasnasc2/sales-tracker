@@ -6,6 +6,7 @@ import {
   getAuth,
   connectAuthEmulator,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail ,
   signOut,
 } from "firebase/auth";
 import firebaseApp from "../firebase.js";
@@ -42,6 +43,18 @@ export const useUserStore = defineStore("user", {
         const errorMessage = error.message;
         console.log(errorCode, errorMessage);
         alertStore.setAlert(error,errorMessage, 5)
+      }
+    },
+    async recover(email) {
+      try {
+        await sendPasswordResetEmail(auth, email);
+        console.log('Password recovery email sent successfully');
+        router.push("login");
+        alertStore.setAlert('Password recovery email sent successfully',"success", 5)
+      } catch (error) {
+        console.error('Error sending password recovery email:', error.message);
+        console.log(error);
+          alertStore.setAlert(error,"error", 5)
       }
     },
     logout() {
