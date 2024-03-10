@@ -171,9 +171,12 @@ export default {
       );
     },
     searchedItems() {
-      return this.filteredItems.filter((item) =>
-        !!this.searchStore.text ? item.name.includes(this.searchStore.text) : true
-      );
+      return this.filteredItems.filter((item) => {
+        let name = item.name.toLowerCase();
+        !!this.searchStore.text
+          ? name.includes(this.searchStore.text.toLowerCase())
+          : true;
+      });
     },
     totalQuantityInCart() {
       return this.cart.reduce((total, item) => total + item.quantity, 0);
