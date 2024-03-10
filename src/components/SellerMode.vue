@@ -171,12 +171,12 @@ export default {
       );
     },
     searchedItems() {
-      return this.filteredItems.filter((item) => {
-        let name = item.name.toLowerCase();
+      let text = this.searchStore.text.toLowerCase()
+      return this.filteredItems.filter((item) =>
         !!this.searchStore.text
-          ? name.includes(this.searchStore.text.toLowerCase())
-          : true;
-      });
+          ? item.name.toLowerCase().includes(text)
+          : true
+      );
     },
     totalQuantityInCart() {
       return this.cart.reduce((total, item) => total + item.quantity, 0);
