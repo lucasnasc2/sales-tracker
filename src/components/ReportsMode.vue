@@ -67,7 +67,7 @@
                 density="compact"
               >
                 <v-list-item-title>{{
-                  getProductById(key).name
+                  value.name
                 }}</v-list-item-title>
 
                 <template v-slot:append>
@@ -134,11 +134,11 @@
           <v-list-item
             v-for="item in selectedSale.items"
             :key="item.id"
-            :subtitle="getProductById(item.id).description"
-            :title="getProductById(item.id).name"
+            :subtitle="item.description"
+            :title="item.name"
           >
             <v-list-item-subtitle>{{
-              getProductById(item.id).category
+              item.category
             }}</v-list-item-subtitle>
 
             <template v-slot:append
@@ -248,6 +248,7 @@ export default {
         for (const item of sale.items) {
           if (!totalsByProduct[item.id]) {
             totalsByProduct[item.id] = {
+              name: item.name,
               totalQuantity: 0,
               totalPrice: 0,
             };

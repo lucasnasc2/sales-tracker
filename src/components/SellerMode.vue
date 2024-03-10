@@ -221,6 +221,8 @@ export default {
       } else {
         this.cart.push({
           id: item.id,
+          name: item.name,
+          description: item.description,
           category: item.category,
           price: item.price,
           quantity: this.quantity,
