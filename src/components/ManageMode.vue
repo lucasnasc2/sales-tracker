@@ -154,6 +154,7 @@ export default {
       this.isEditing = false;
     },
     addProduct() {
+      this.isEditing = false;
       this.editedItem = {
         name: "",
         description: "",
@@ -164,7 +165,6 @@ export default {
         price: 0,
       };
       this.dialog = true;
-      this.isEditing = false;
     },
     saveChanges() {
       if (this.isEditing) {
