@@ -1,6 +1,10 @@
 <template>
   <v-container class="pa-0">
+    
     <!-- Chips for filtering -->
+    <div class="px-2">
+      <v-switch v-model="unactiveProducts" hide-details inset label="Productos desactivados"></v-switch>
+    </div>
     <div class="px-2">
       <CategoryFilter :items="categoryOptions" @selected="toggleFilterByCategory"></CategoryFilter>
     </div>
@@ -26,10 +30,10 @@
           </v-form>
         </v-card-text>
         <v-card-actions>
-          <v-btn v-if="isEditing" @click="confirmDelete">Delete</v-btn>
-          <v-spacer></v-spacer>
-          <v-btn @click="dialog = false">Cancel</v-btn>
-          <v-btn color="primary" @click="saveChanges" :disabled="!checkFieldsFilled()">{{ isEditing ? "Save" : "Add"
+          <v-btn v-if="isEditing" @click="confirmDelete">Borrar</v-btn>
+          <v-btn v-if="isEditing" @click="confirmToggleActive">{{editedItem.active ? 'desactivar' : 'activar'}}</v-btn>
+          <v-btn @click="dialog = false">Cancelar</v-btn>
+          <v-btn color="primary" @click="saveChanges" :disabled="!checkFieldsFilled()">{{ isEditing ? "guardar" : "adicionar"
           }}</v-btn>
         </v-card-actions>
       </v-card>
@@ -75,6 +79,7 @@ export default {
       },
       dialog: false,
       isEditing: false, // Added to track if editing or adding new product
+      unactiveProducts: true,
     };
   },
   computed: {
@@ -130,6 +135,19 @@ export default {
       this.dialog = true;
       this.isEditing = true;
     },
+    cleatEditedItem() {
+      this.dialog = false;
+      this.editedItem = {
+        name: "",
+        description: "",
+        stock: 1,
+        active: true,
+        img: "",
+        category: "",
+        price: 0,
+      };
+      this.isEditing = false;
+    },
     addProduct() {
       this.editedItem = {
         name: "",
@@ -150,16 +168,25 @@ export default {
       } else {
         this.productStore.addToFirestore(this.editedItem);
       }
-      this.dialog = false;
+      this.cleatEditedItem();
     },
     confirmDelete() {
       if (confirm("Are you sure you want to delete this item?")) {
         this.deleteItemConfirmed();
       }
     },
+    confirmToggleActive() {
+      if (confirm(`Seguro que quiere ${this.editedItem.active ? 'desactivar' : 'activar'} este producto?`)) {
+        this.toggleActiveConfirmed();
+      }
+    },
+    toggleActiveConfirmed() {
+      this.productStore.toggleActive(this.editedItem);
+      this.cleatEditedItem();
+    },
     deleteItemConfirmed() {
       this.productStore.deleteFirestore(this.editedItem);
-      this.dialog = false;
+      this.cleatEditedItem();
     },
     checkFieldsFilled() {
       return (
