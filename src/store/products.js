@@ -57,8 +57,10 @@ export const useProductStore = defineStore("product", {
       try {
         let item = JSON.parse(JSON.stringify(product));
         delete item.id;
+        delete item.createdTimestamp;
         let productObject = {
           ...item,
+          createdTimestamp: product.createdTimestamp,
           modifiedBy: userStore.user.email,
           modifiedTimestamp: serverTimestamp(),
         }
