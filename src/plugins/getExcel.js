@@ -63,16 +63,23 @@ async function generateExcelInventory(productsData) {
     "Description",
     "Category",
     "Price",
+    "Stock",
+    "Last modified",
+    "Modified by"
   ]);
 
   // Add data to worksheet
   productsData.forEach((product) => {
+    const modifiedTime = toDate(product.modifiedTimestamp);
      sheet.addRow([
         product.id,
         product.name,
         item.description,
         product.category,
         item.price,
+        item.stock,
+        modifiedTime,
+        item.modifiedBy
       ]);
   });
 
