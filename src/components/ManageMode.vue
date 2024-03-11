@@ -57,6 +57,7 @@ import { mapStores } from "pinia";
 import { useProductStore } from "@/store/products.js";
 import { useSearchStore } from "@/store/search.js";
 import { useLoaderStore } from "@/store/loader.js";
+import { useAlertStore } from "@/store/alerts";
 import { generateExcelInventory } from "@/plugins/getExcel.js";
 
 export default {
@@ -77,7 +78,7 @@ export default {
     };
   },
   computed: {
-    ...mapStores(useProductStore, useSearchStore, useLoaderStore),
+    ...mapStores(useProductStore, useSearchStore, useLoaderStore, useAlertStore),
     categoryOptions() {
       return [...new Set(this.productStore.products.map((item) => item.category))];
     },
