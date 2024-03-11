@@ -292,16 +292,9 @@ export default {
     },
   },
   mounted() {
-    this.productStore.fetchProducts();
     this.salesStore.fetchSales(todaysDate, tomorrow);
   },
   methods: {
-    getProductById(id) {
-      const index = this.productStore.products.findIndex(
-        (product) => product.id === id
-      );
-      return this.productStore.products[index];
-    },
     tsToDate(timestamp) {
       const milliseconds = timestamp.toMillis();
       // Create a new JavaScript Date object using the milliseconds
@@ -387,10 +380,7 @@ export default {
         if (confirm("Descargar informe en formato .xlsx?")) {
           this.loaderStore.state = true;
           // Assuming salesData and productsData are available in your component
-          const excelBlob = await generateExcelSales(
-            this.salesStore.sales,
-            this.productStore.products
-          );
+          const excelBlob = await generateExcelSales(this.salesStore.sales);
           const url = window.URL.createObjectURL(excelBlob);
           const link = document.createElement("a");
           link.href = url;
