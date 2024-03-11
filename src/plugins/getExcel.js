@@ -6,7 +6,7 @@ function toDate(timestamp) {
   return new Date(seconds * 1000 + nanoseconds / 1000000);
 }
 // Function to generate Excel file
-async function generateExcelSales(salesData, productsData) {
+async function generateExcelSales(salesData) {
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet("Sales Data");
 
@@ -26,13 +26,10 @@ async function generateExcelSales(salesData, productsData) {
   // Add data to worksheet
   salesData.forEach((sale) => {
     sale.items.forEach((item) => {
-      const productName =
-        productsData.find((product) => product.id === item.id)?.name ||
-        "Unknown";
       const checkoutTime = toDate(sale.checkoutTime);
       sheet.addRow([
         item.id,
-        productName,
+        item.name,
         item.category,
         item.quantity,
         item.price,
@@ -71,6 +68,7 @@ async function generateExcelInventory(productsData) {
   // Add data to worksheet
   productsData.forEach((product) => {
     const modifiedTime = toDate(product.modifiedTimestamp);
+    const createdTime = toDate(product.createdTimestamp);
      sheet.addRow([
         product.id,
         product.name,
@@ -78,6 +76,7 @@ async function generateExcelInventory(productsData) {
         product.category,
         item.price,
         item.stock,
+        createdTime,
         modifiedTime,
         item.modifiedBy
       ]);
