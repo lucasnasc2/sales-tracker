@@ -221,8 +221,8 @@ export default {
     sortedSalesByDate() {
       return this.salesStore.sales.slice().sort((a, b) => {
         return (
-          new Date(a.checkoutTime.toMillis()) -
-          new Date(b.checkoutTime.toMillis())
+          new Date(b.checkoutTime.toMillis()) -
+          new Date(a.checkoutTime.toMillis())
         );
       });
     },
