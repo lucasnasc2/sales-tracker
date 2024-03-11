@@ -192,7 +192,7 @@ import { useProductStore } from "@/store/products.js";
 import { useSalesStore } from "@/store/sales.js";
 import { useAlertStore } from "@/store/alerts";
 import { useLoaderStore } from "@/store/loader.js";
-import { generateExcel } from "@/plugins/getExcel.js";
+import { generateExcelSales } from "@/plugins/getExcel.js";
 const todaysDate = new Date();
 todaysDate.setHours(0, 0, 0, 0);
 
@@ -387,7 +387,7 @@ export default {
         if (confirm("Descargar informe en formato .xlsx?")) {
           this.loaderStore.state = true;
           // Assuming salesData and productsData are available in your component
-          const excelBlob = await generateExcel(
+          const excelBlob = await generateExcelSales(
             this.salesStore.sales,
             this.productStore.products
           );
