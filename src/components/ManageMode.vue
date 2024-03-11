@@ -14,6 +14,8 @@
         <v-card-title>{{
           isEditing ? "Edit Item" : "Add Product"
         }}</v-card-title>
+        <span class="text-overline py-2">{{'Creado en: ' +  tsToDate(editedItem.createdTimestamp)}}</span>
+        <span class="text-overline py-2" v-if="wasModified(editedItem.createdTimestamp,editedItem.modifiedTimestamp)">{{'Modificado en: ' +  tsToDate(editedItem.modifiedTimestamp)}}</span>
         <v-card-text>
           <FileUploader :src="editedItem.img" @fileDiscarded="editedItem.img=''" @imageUploaded="handleImageUploaded" />
           <v-form class="mt-4" ref="form">
@@ -78,6 +80,13 @@ export default {
     categoryOptions() {
       return [...new Set(this.productStore.products.map((item) => item.category))];
     },
+    wasModified() {
+      return function (createdTs, modifiedTs) {
+        let createdDate = this.tsToDate(createdTs)
+        let modifiedDate = this.tsToDate(modifiedTs)
+        return modifiedDate != createdDate
+      }
+    },
     filteredItems() {
       return this.productStore.products.filter((item) =>
         !!this.filteredCategory ? this.filteredCategory == item.category : true
@@ -95,6 +104,12 @@ export default {
   watch: {
   },
   methods: {
+    tsToDate(timestamp) {
+      const milliseconds = timestamp.toMillis();
+      // Create a new JavaScript Date object using the milliseconds
+      const convertedDate = new Date(milliseconds).toLocaleString();
+      return convertedDate;
+    },
     toggleFilterByCategory(category) {
       if (
         !this.filteredCategory ||
