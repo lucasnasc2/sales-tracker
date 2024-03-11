@@ -61,6 +61,7 @@ async function generateExcelInventory(productsData) {
     "Category",
     "Price",
     "Stock",
+    "Created",
     "Last modified",
     "Modified by"
   ]);
