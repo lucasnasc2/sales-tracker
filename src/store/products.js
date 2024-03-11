@@ -42,6 +42,7 @@ export const useProductStore = defineStore("product", {
           ...product,
           modifiedBy: userStore.user.email,
           modifiedTimestamp: serverTimestamp(),
+          createdTimestamp: serverTimestamp(),
         };
         const docRef = await addDoc(collection(db, "products"), productObject);
         console.log("Document written with ID: ", docRef.id);
@@ -60,7 +61,6 @@ export const useProductStore = defineStore("product", {
           ...item,
           modifiedBy: userStore.user.email,
           modifiedTimestamp: serverTimestamp(),
-          createdTimestamp: serverTimestamp(),
         }
         const productRef = doc(db, "products", product.id);
         await setDoc(productRef, { ...productObject }, { merge: true });
