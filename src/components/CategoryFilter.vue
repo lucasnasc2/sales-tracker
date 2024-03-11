@@ -24,11 +24,10 @@ export default {
   },
   computed: {
     colorPalette() {
-      let items = this.items.shift();
       let baseColor = this.$globals.secondaryColor.split(".")[0] + ".base";
       return generateAnalogousColorPalette(
         getColorByValuePath(baseColor),
-        items.length
+        this.items.length
       );
     },
   },
