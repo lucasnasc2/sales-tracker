@@ -66,9 +66,7 @@
                 :key="key"
                 density="compact"
               >
-                <v-list-item-title>{{
-                  value.name
-                }}</v-list-item-title>
+                <v-list-item-title>{{ value.name }}</v-list-item-title>
 
                 <template v-slot:append>
                   x{{ value.totalQuantity }} => {{ $globals.currency
@@ -79,7 +77,7 @@
             <v-list density="compact">
               <v-divider></v-divider>
               <v-list-item
-                v-for="sale in salesStore.sales"
+                v-for="sale in sortedSalesByDate"
                 :key="sale.id"
                 :title="tsToDate(sale.checkoutTime)"
                 @click="selectSale(sale)"
@@ -137,9 +135,7 @@
             :subtitle="item.description"
             :title="item.name"
           >
-            <v-list-item-subtitle>{{
-              item.category
-            }}</v-list-item-subtitle>
+            <v-list-item-subtitle>{{ item.category }}</v-list-item-subtitle>
 
             <template v-slot:append
               >{{ item.quantity }}x {{ $globals.currency }}{{ item.price }} =
@@ -221,6 +217,11 @@ export default {
     ...mapStores(useProductStore, useSalesStore, useAlertStore, useLoaderStore),
     formattedSelectedDate() {
       return new Date(this.selectedDate).toLocaleDateString();
+    },
+    sortedSalesByDate() {
+      return this.salesStore.sales.slice().sort((a, b) => {
+        return new Date(b.checkoutTime) - new Date(a.checkoutTime);
+      });
     },
     totalItemsByCategory() {
       const totalsByCategory = {};
