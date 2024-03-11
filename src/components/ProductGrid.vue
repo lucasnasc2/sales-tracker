@@ -7,7 +7,7 @@
             <v-card-title :style="!item.img ? 'color: black;' : ''">{{ item.name }}</v-card-title>
             <v-card-subtitle :style="!item.img ? 'color: black;' : ''">{{ item.description }}</v-card-subtitle>
           </v-img>
-          <v-list :bg-color="getColorByCategory(item.category)" lines="one">
+          <v-list :bg-color="item.active ? getColorByCategory(item.category) : 'grey-lighten-1'" lines="one">
             <v-list-item  density="compact" :subtitle="item.category">
               <template v-slot:append>{{ $globals.currency }}{{ item.price }}</template>
             </v-list-item>
