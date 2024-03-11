@@ -1,7 +1,7 @@
 <template>
   <v-chip-group filter column>
     <v-chip
-      :color="colorPalette[index]"
+      :color="colorPalette[index + 1]"
       class="mx-1"
       v-for="(item, index) in items"
       :key="index"
@@ -24,10 +24,11 @@ export default {
   },
   computed: {
     colorPalette() {
+      let items = this.items.shift();
       let baseColor = this.$globals.secondaryColor.split(".")[0] + ".base";
       return generateAnalogousColorPalette(
         getColorByValuePath(baseColor),
-        this.items.length - 1
+        items.length
       );
     },
   },
