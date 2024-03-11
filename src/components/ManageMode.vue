@@ -3,9 +3,6 @@
     
     <!-- Chips for filtering -->
     <div class="px-2">
-      <v-switch v-model="unactiveProducts" hide-details inset label="Productos desactivados"></v-switch>
-    </div>
-    <div class="px-2">
       <CategoryFilter :items="categoryOptions" @selected="toggleFilterByCategory"></CategoryFilter>
     </div>
 
@@ -79,7 +76,6 @@ export default {
       },
       dialog: false,
       isEditing: false, // Added to track if editing or adding new product
-      unactiveProducts: true,
     };
   },
   computed: {
