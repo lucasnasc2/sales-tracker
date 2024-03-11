@@ -63,7 +63,8 @@ async function generateExcelInventory(productsData) {
     "Stock",
     "Created",
     "Last modified",
-    "Modified by"
+    "Modified by",
+    "Active"
   ]);
 
   // Add data to worksheet
@@ -79,7 +80,8 @@ async function generateExcelInventory(productsData) {
         product.stock,
         createdTime,
         modifiedTime,
-        product.modifiedBy
+        product.modifiedBy,
+        product.active
       ]);
   });
 
