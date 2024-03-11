@@ -1,7 +1,7 @@
 <template>
   <v-chip-group filter column>
     <v-chip
-      :color="colorPalette[index + 1]"
+      :color="colorPalette[index]"
       class="mx-1"
       v-for="(item, index) in items"
       :key="index"
