@@ -117,7 +117,7 @@ export default {
   },
   methods: {
     tsToDate(timestamp) {
-if(!timestamp.hasOwnProperty('toMillis')) return
+if(!timestamp) return
       const milliseconds = timestamp.toMillis();
       // Create a new JavaScript Date object using the milliseconds
       const convertedDate = new Date(milliseconds).toLocaleString();
