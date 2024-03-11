@@ -155,21 +155,19 @@ export default {
       cartDialog: false,
       cart: [], // Array to store items in the cart
       quantity: 1, // Default quantity,
-      showInactive: false,
     };
   },
   computed: {
     ...mapStores(useProductStore, useSalesStore, useSearchStore),
     categoryOptions() {
       let categories = [
-        "Inactivos",
         ...new Set(this.productStore.products.map((item) => item.category)),
       ];
       return categories;
     },
     filteredItems() {
     return this.productStore.products.filter((item) => {
-      const isActive = item.active || this.showInactive;
+      const isActive = item.active;
       return isActive && (!this.filteredCategory || this.filteredCategory === item.category);
     });
   },
@@ -202,10 +200,6 @@ export default {
       return this.productStore.products[index];
     },
     toggleFilterByCategory(category) {
-      if(category == "Inactivos") {
-        this.showInactive = !this.showInactive
-        return
-      }
       if (
         !this.filteredCategory ||
         (!!this.filteredCategory && this.filteredCategory != category)
