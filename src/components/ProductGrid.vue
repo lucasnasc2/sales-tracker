@@ -34,10 +34,11 @@ export default {
   },
   computed: {
     colorPalette() {
-      return generateAnalogousColorPalette(getColorByValuePath(this.$globals.secondaryColor), this.categories.length)
+      return generateAnalogousColorPalette(getColorByValuePath(this.$globals.secondaryColor), this.categories.length - 1)
     },
     getColorByCategory() {
       return (category) => {
+        let categories = this.categories.shift();
         let index = this.categories.indexOf(category)
         return index !== -1 ? this.colorPalette[index] : ''
       }
