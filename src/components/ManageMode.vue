@@ -25,10 +25,16 @@
             <v-text-field v-model="editedItem.category" label="Category" @input="checkFieldsFilled"></v-text-field>
             <v-text-field v-model="editedItem.price" label="Price" @input="checkFieldsFilled"></v-text-field>
           </v-form>
+          <v-list>
+              <v-list-item title="Activo">
+                <template v-slot:append>
+                  <v-switch color="primary" density="compact" inset hide-details v-model="editedItem.active"></v-switch></template
+                >
+              </v-list-item>
+            </v-list>
         </v-card-text>
         <v-card-actions>
           <v-btn v-if="isEditing" @click="confirmDelete">Borrar</v-btn>
-          <v-btn v-if="isEditing" @click="confirmToggleActive">{{editedItem.active ? 'desactivar' : 'activar'}}</v-btn>
           <v-btn @click="dialog = false">Cancelar</v-btn>
           <v-btn color="primary" @click="saveChanges" :disabled="!checkFieldsFilled()">{{ isEditing ? "guardar" : "adicionar"
           }}</v-btn>
@@ -170,15 +176,6 @@ export default {
       if (confirm("Are you sure you want to delete this item?")) {
         this.deleteItemConfirmed();
       }
-    },
-    confirmToggleActive() {
-      if (confirm(`Seguro que quiere ${this.editedItem.active ? 'desactivar' : 'activar'} este producto?`)) {
-        this.toggleActiveConfirmed();
-      }
-    },
-    toggleActiveConfirmed() {
-      this.productStore.toggleActive(this.editedItem);
-      this.cleatEditedItem();
     },
     deleteItemConfirmed() {
       this.productStore.deleteFirestore(this.editedItem);
