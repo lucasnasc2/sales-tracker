@@ -27,7 +27,7 @@ export default {
       let baseColor = this.$globals.secondaryColor.split(".")[0] + ".base";
       return generateAnalogousColorPalette(
         getColorByValuePath(baseColor),
-        this.items.length
+        this.items.length - 1
       );
     },
   },
