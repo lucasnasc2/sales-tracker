@@ -40,12 +40,21 @@
       <v-icon>mdi-plus</v-icon>
     </v-btn>
   </div>
+  <div style="position: fixed; bottom: 20px; left: 20px">
+    <v-btn
+      icon="mdi-file-download-outline"
+      color="primary"
+      :disabled="!productStore.products.length"
+      @click="downloadExcel"
+    ></v-btn>
+  </div>
 </template>
 
 <script>
 import { mapStores } from "pinia";
 import { useProductStore } from "@/store/products.js";
 import { useSearchStore } from "@/store/search.js";
+import { generateExcelInventory } from "@/plugins/getExcel.js";
 
 export default {
   data() {
@@ -141,6 +150,29 @@ export default {
         this.editedItem.category &&
         this.editedItem.price
       );
+    },
+    async downloadExcel() {
+      try {
+        if (confirm("Descargar informe en formato .xlsx?")) {
+          this.loaderStore.state = true;
+          // Assuming salesData and productsData are available in your component
+          const excelBlob = await generateExcelInventory(
+            this.productStore.products
+          );
+          const url = window.URL.createObjectURL(excelBlob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.setAttribute("download", "inventory_data.xlsx");
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          this.loaderStore.state = false;
+        }
+      } catch (error) {
+        console.log(error);
+        this.loaderStore.state = false;
+        this.alertStore.setAlert(error, "error", 7);
+      }
     },
   },
 };
