@@ -214,6 +214,7 @@ export default {
       this.dialog = true;
     },
     addItemToCart(item) {
+      if (!item.active) return
       console.log(item);
       const index = this.cart.findIndex((cartItem) => cartItem.id === item.id);
       console.log(index);
