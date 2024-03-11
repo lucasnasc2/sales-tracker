@@ -15,10 +15,10 @@
         <v-card-title>{{
           isEditing ? "Edit Item" : "Add Product"
         }}</v-card-title>
-        <div if="isEditing">
-          <span class="text-caption px-3">{{'Creado en: ' +  tsToDate(editedItem.createdTimestamp)}}</span>
-          <span class="text-caption px-3" v-if="wasModified(editedItem.createdTimestamp,editedItem.modifiedTimestamp)">{{'Modificado en: ' +  tsToDate(editedItem.modifiedTimestamp)}}<br />{{'Por: ' + editedItem.modifiedBy}}</span>
-        </div>
+
+        <span if="isEditing" class="text-caption px-3">{{'Creado en: ' +  tsToDate(editedItem.createdTimestamp)}}</span>
+        <span if="isEditing" class="text-caption px-3" v-if="wasModified(editedItem.createdTimestamp,editedItem.modifiedTimestamp)">{{'Modificado en: ' +  tsToDate(editedItem.modifiedTimestamp)}}<br />{{'Por: ' + editedItem.modifiedBy}}</span>
+
         <v-card-text>
           <FileUploader :src="editedItem.img" @fileDiscarded="editedItem.img=''" @imageUploaded="handleImageUploaded" />
           <v-form class="mt-4" ref="form">
