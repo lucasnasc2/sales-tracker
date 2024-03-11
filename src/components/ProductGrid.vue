@@ -2,7 +2,7 @@
   <v-container>
     <v-row class="pa-1">
       <v-col class="pa-2" v-for="(item, index) in items" :key="index" cols="6" :sm="3" :md="2">
-        <v-card :color="getColorByCategory(item.category)" @click="selectItem(item)">
+        <v-card :color="item.active ? getColorByCategory(item.category) : 'gray-lighten-1'" @click="selectItem(item)">
           <v-img class="align-end text-white" height="100" :src="item.img" cover>
             <v-card-title :style="!item.img ? 'color: black;' : ''">{{ item.name }}</v-card-title>
             <v-card-subtitle :style="!item.img ? 'color: black;' : ''">{{ item.description }}</v-card-subtitle>
@@ -46,10 +46,9 @@ export default {
   },
   methods: {
     selectItem(item) {
+      if (!item.active) return
       this.$emit('selected', item);
     },
-
-
   }
 };
 </script>
