@@ -94,8 +94,8 @@ export default {
     },
     wasModified() {
       return function (createdTs, modifiedTs) {
-        let createdDate = this.tsToDate(createdTs)
-        let modifiedDate = this.tsToDate(modifiedTs)
+        let createdDate = this.tsToDate(createdTs) ?? "";
+        let modifiedDate = this.tsToDate(modifiedTs) ?? "";
         return modifiedDate != createdDate
       }
     },
