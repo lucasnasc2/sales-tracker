@@ -73,13 +73,13 @@ async function generateExcelInventory(productsData) {
      sheet.addRow([
         product.id,
         product.name,
-        item.description,
+        product.description,
         product.category,
-        item.price,
-        item.stock,
+        product.price,
+        product.stock,
         createdTime,
         modifiedTime,
-        item.modifiedBy
+        product.modifiedBy
       ]);
   });
 
