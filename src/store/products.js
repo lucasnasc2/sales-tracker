@@ -57,10 +57,30 @@ export const useProductStore = defineStore("product", {
       try {
         let item = JSON.parse(JSON.stringify(product));
         delete item.id;
-        delete item.createdTimestamp;
         let productObject = {
           ...item,
           createdTimestamp: product.createdTimestamp,
+          modifiedBy: userStore.user.email,
+          modifiedTimestamp: serverTimestamp(),
+        }
+        const productRef = doc(db, "products", product.id);
+        await setDoc(productRef, { ...productObject }, { merge: true });
+        console.log("document updated");
+      } catch (error) {
+        alertStore.setAlert(error, "error", 5);
+        console.log(error);
+      }
+    },
+    async toggleActive(product) {
+      const userStore = useUserStore();
+      const alertStore = useAlertStore();
+      try {
+        let item = JSON.parse(JSON.stringify(product));
+        delete item.id;
+        let productObject = {
+          ...item,
+          createdTimestamp: product.createdTimestamp,
+          active: !item.active,
           modifiedBy: userStore.user.email,
           modifiedTimestamp: serverTimestamp(),
         }
