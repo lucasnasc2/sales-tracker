@@ -17,7 +17,7 @@
         }}</v-card-title>
 
         <span if="isEditing" class="text-caption px-3">{{'Creado en: ' +  tsToDate(editedItem.createdTimestamp)}}</span>
-        <span if="isEditing" class="text-caption px-3" v-if="wasModified(editedItem.createdTimestamp,editedItem.modifiedTimestamp)">{{'Modificado en: ' +  tsToDate(editedItem.modifiedTimestamp)}}<br />{{'Por: ' + editedItem.modifiedBy}}</span>
+        <span if="isEditing && wasModified(editedItem.createdTimestamp,editedItem.modifiedTimestamp)" class="text-caption px-3">{{'Modificado en: ' +  tsToDate(editedItem.modifiedTimestamp)}}<br />{{'Por: ' + editedItem.modifiedBy}}</span>
 
         <v-card-text>
           <FileUploader :src="editedItem.img" @fileDiscarded="editedItem.img=''" @imageUploaded="handleImageUploaded" />
