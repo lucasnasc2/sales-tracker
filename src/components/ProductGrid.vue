@@ -46,7 +46,6 @@ export default {
   },
   methods: {
     selectItem(item) {
-      if (!item.active) return
       this.$emit('selected', item);
     },
   }
