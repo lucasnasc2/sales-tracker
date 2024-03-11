@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { useUserStore } from "./user.js";
 import { useAlertStore } from "./alerts.js";
 import {
   getFirestore,
@@ -9,6 +10,7 @@ import {
   addDoc,
   doc,
   deleteDoc,
+  serverTimestamp
 } from "firebase/firestore";
 import firebaseApp from "../firebase.js";
 const db = getFirestore(firebaseApp);
@@ -33,9 +35,15 @@ export const useProductStore = defineStore("product", {
       }
     },
     async addToFirestore(product) {
+      const userStore = useUserStore();
       const alertStore = useAlertStore();
       try {
-        const docRef = await addDoc(collection(db, "products"), product);
+        let productObject = {
+          ...product,
+          modifiedBy: userStore.user.email,
+          modifiedTimestamp: serverTimestamp(),
+        };
+        const docRef = await addDoc(collection(db, "products"), productObject);
         console.log("Document written with ID: ", docRef.id);
       } catch (error) {
         alertStore.setAlert(error, "error", 5);
@@ -43,12 +51,18 @@ export const useProductStore = defineStore("product", {
       }
     },
     async updateFirestore(product) {
+      const userStore = useUserStore();
       const alertStore = useAlertStore();
       try {
         let item = JSON.parse(JSON.stringify(product));
         delete item.id;
+        let productObject = {
+          ...item,
+          modifiedBy: userStore.user.email,
+          modifiedTimestamp: serverTimestamp(),
+        }
         const productRef = doc(db, "products", product.id);
-        await setDoc(productRef, { ...item }, { merge: true });
+        await setDoc(productRef, { ...productObject }, { merge: true });
         console.log("document updated");
       } catch (error) {
         alertStore.setAlert(error, "error", 5);
