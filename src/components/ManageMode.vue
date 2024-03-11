@@ -15,8 +15,10 @@
         <v-card-title>{{
           isEditing ? "Edit Item" : "Add Product"
         }}</v-card-title>
-        <span class="text-caption px-3">{{'Creado en: ' +  tsToDate(editedItem.createdTimestamp)}}</span>
-        <span class="text-caption px-3" v-if="wasModified(editedItem.createdTimestamp,editedItem.modifiedTimestamp)">{{'Modificado en: ' +  tsToDate(editedItem.modifiedTimestamp)}}<br />{{'Por: ' + editedItem.modifiedBy}}</span>
+        <div if="isEditing">
+          <span class="text-caption px-3">{{'Creado en: ' +  tsToDate(editedItem.createdTimestamp)}}</span>
+          <span class="text-caption px-3" v-if="wasModified(editedItem.createdTimestamp,editedItem.modifiedTimestamp)">{{'Modificado en: ' +  tsToDate(editedItem.modifiedTimestamp)}}<br />{{'Por: ' + editedItem.modifiedBy}}</span>
+        </div>
         <v-card-text>
           <FileUploader :src="editedItem.img" @fileDiscarded="editedItem.img=''" @imageUploaded="handleImageUploaded" />
           <v-form class="mt-4" ref="form">
@@ -26,12 +28,12 @@
             <v-text-field v-model="editedItem.price" label="Price" @input="checkFieldsFilled"></v-text-field>
           </v-form>
           <v-list>
-              <v-list-item title="Activo">
-                <template v-slot:append>
-                  <v-switch color="primary" density="compact" inset hide-details v-model="editedItem.active"></v-switch></template
-                >
-              </v-list-item>
-            </v-list>
+            <v-list-item title="Activo">
+              <template v-slot:append>
+                <v-switch color="primary" density="compact" inset hide-details v-model="editedItem.active"></v-switch></template
+              >
+            </v-list-item>
+          </v-list>
         </v-card-text>
         <v-card-actions>
           <v-btn v-if="isEditing" @click="confirmDelete">Borrar</v-btn>
