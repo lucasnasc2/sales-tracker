@@ -6,7 +6,7 @@ function toDate(timestamp) {
   return new Date(seconds * 1000 + nanoseconds / 1000000);
 }
 // Function to generate Excel file
-async function generateExcel(salesData, productsData) {
+async function generateExcelSales(salesData, productsData) {
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet("Sales Data");
 
@@ -51,4 +51,36 @@ async function generateExcel(salesData, productsData) {
   });
 }
 
-export { generateExcel };
+// Function to generate Excel file
+async function generateExcelInventory(productsData) {
+  const workbook = new ExcelJS.Workbook();
+  const sheet = workbook.addWorksheet("Products Data");
+
+  // Add headers to worksheet
+  sheet.addRow([
+    "ID",
+    "Name",
+    "Description",
+    "Category",
+    "Price",
+  ]);
+
+  // Add data to worksheet
+  productsData.forEach((product) => {
+     sheet.addRow([
+        product.id,
+        product.name,
+        item.description,
+        product.category,
+        item.price,
+      ]);
+  });
+
+  // Generate Excel file as a blob
+  const buffer = await workbook.xlsx.writeBuffer();
+  return new Blob([buffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+}
+
+export { generateExcelSales, generateExcelInventory };
