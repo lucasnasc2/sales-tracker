@@ -66,7 +66,7 @@
 
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn @click="dialog = false">Close</v-btn>
+          <v-btn @click="closeProductDetails">Close</v-btn>
           <v-btn color="primary" @click="addItemToCart(selectedItem)"
             >Add to Cart</v-btn
           >
@@ -211,10 +211,14 @@ export default {
     },
     showDetails(item) {
       this.selectedItem = item;
+      this.quantity = 1;
       this.dialog = true;
     },
+    closeProductDetails() {
+      this.quantity = 1;
+      this.dialog = false;
+    },
     addItemToCart(item) {
-      if (!item.active) return
       console.log(item);
       const index = this.cart.findIndex((cartItem) => cartItem.id === item.id);
       console.log(index);
@@ -230,8 +234,7 @@ export default {
           quantity: this.quantity,
         });
       }
-      this.quantity = 1; // Reset quantity after adding to cart
-      this.dialog = false; // Close product detail dialog after adding to cart
+      this.closeProductDetails() // Close product detail dialog after adding to cart
 
       // Close cart dialog if cart is empty
       if (this.cart.length === 0) {
