@@ -6,17 +6,19 @@ function toDate(timestamp) {
   return new Date(seconds * 1000 + nanoseconds / 1000000);
 }
 // Function to generate Excel file
-async function generateExcelSales(salesData) {
+async function generateExcelSales(salesData, stockData) {
   const workbook = new ExcelJS.Workbook();
-  const sheet = workbook.addWorksheet("Sales Data");
+  const salesSheet = workbook.addWorksheet("Sales Data");
+  const stockSheet = workbook.addWorksheet("Manual Stock Movements");
 
   // Add headers to worksheet
-  sheet.addRow([
+  salesSheet.addRow([
     "Item ID",
     "Product Name",
     "Category",
     "Quantity",
     "Product Price",
+    "Transaction Type",
     "User ID",
     "Checkout Time",
     "Checkout Price",
@@ -27,12 +29,13 @@ async function generateExcelSales(salesData) {
   salesData.forEach((sale) => {
     sale.items.forEach((item) => {
       const checkoutTime = toDate(sale.checkoutTime);
-      sheet.addRow([
+      salesSheet.addRow([
         item.id,
         item.name,
         item.category,
         item.quantity,
         item.price,
+        sale.transactionType,
         sale.userId,
         checkoutTime,
         sale.checkoutPrice,
@@ -41,6 +44,36 @@ async function generateExcelSales(salesData) {
     });
   });
 
+  // Add headers to worksheet
+  stockSheet.addRow([
+    "Product ID",
+    "Product Name",
+    "Category",
+    "Quantity",
+    "Product Price",
+    "Transaction Type",
+    "User ID",
+    "Update Time",
+    "Update ID",
+  ]);
+
+  // Add data to worksheet
+  stockData.forEach((record) => {
+    record.items.forEach((item) => {
+      const updateTime = toDate(record.updateTime);
+      stockSheet.addRow([
+        item.id,
+        item.name,
+        item.category,
+        item.quantity,
+        item.price,
+        record.transactionType,
+        record.userId,
+        updateTime,
+        record.id,
+      ]);
+    });
+  });
   // Generate Excel file as a blob
   const buffer = await workbook.xlsx.writeBuffer();
   return new Blob([buffer], {

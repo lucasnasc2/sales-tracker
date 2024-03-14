@@ -1,19 +1,17 @@
 <template>
-  <v-container class="px-0">
-    <!-- Chips for filtering -->
-    <div class="px-2">
+  <!-- Chips for filtering -->
+
+  <v-container>
+    <div class="pb-2">
       <CategoryFilter
         :items="categoryOptions"
         @selected="toggleFilterByCategory"
       ></CategoryFilter>
     </div>
-
     <!-- Grid of square cards -->
-    <ProductGrid
-      :items="searchedItems"
-      :categories="categoryOptions"
-      @selected="showDetails"
-    ></ProductGrid>
+    <v-card variant="tonal">
+      <ProductList :items="searchedItems" @selected="showDetails"></ProductList>
+    </v-card>
 
     <!-- Popup dialog for product details -->
     <v-dialog v-model="dialog" max-width="500">
@@ -27,10 +25,7 @@
             <v-list-item-subtitle>{{
               selectedItem.category
             }}</v-list-item-subtitle>
-            <template v-slot:append
-              >{{ quantity }}x {{ $globals.currency
-              }}{{ selectedItem.price * quantity }}
-            </template>
+            <template v-slot:append>{{ selectedItem.stock }}</template>
           </v-list-item>
         </v-list>
         <v-divider></v-divider>
@@ -65,10 +60,11 @@
         </v-card-actions>
 
         <v-card-actions>
+          <v-btn @click="closeProductDetails">Cerrar</v-btn>
           <v-spacer></v-spacer>
-          <v-btn @click="closeProductDetails">Close</v-btn>
-          <v-btn color="primary" @click="addItemToCart(selectedItem)"
-            >Add to Cart</v-btn
+          <v-btn @click="removeStock(selectedItem)">destruir</v-btn>
+          <v-btn color="success" @click="addItemToCart(selectedItem)"
+            >preparar</v-btn
           >
         </v-card-actions>
       </v-card>
@@ -77,20 +73,13 @@
     <!-- Cart dialog -->
     <v-dialog v-model="cartDialog" max-width="600">
       <v-card>
-        <v-card-title>Cart</v-card-title>
+        <v-card-title>Añadir stock</v-card-title>
         <v-card-actions>
-          <v-btn color="primary" @click="clearCart">Clear Cart</v-btn>
+          <v-btn @click="clearCart">Limpiar</v-btn>
           <v-spacer></v-spacer>
-          <v-btn color="primary" @click="checkout">Checkout</v-btn>
+          <v-btn color="success" @click="checkout">Añadir</v-btn>
         </v-card-actions>
         <v-list>
-          <v-list-item>
-            <v-list-item-title>Total</v-list-item-title>
-
-            <template v-slot:append>
-              {{ checkoutPrice }}
-            </template>
-          </v-list-item>
           <v-divider></v-divider>
           <v-list-item
             density="compact"
@@ -109,9 +98,7 @@
             }}</v-list-item-subtitle>
 
             <template v-slot:append>
-              {{ cartItem.quantity }} x {{ $globals.currency
-              }}{{ cartItem.price }} = {{ $globals.currency
-              }}{{ cartItem.quantity * cartItem.price }}
+              {{ cartItem.quantity }}
               <v-btn flat icon="mdi-delete" @click="removeItemFromCart(index)">
               </v-btn>
             </template>
@@ -131,7 +118,7 @@
       @click="toggleCartDialog"
       :disabled="cart.length === 0"
     >
-      <v-icon>mdi-cart</v-icon>
+      <v-icon>mdi-package-variant-plus</v-icon>
       <v-badge
         v-if="cart.length >= 1"
         :content="totalQuantityInCart"
@@ -144,7 +131,7 @@
 <script>
 import { mapStores } from "pinia";
 import { useProductStore } from "@/store/products.js";
-import { useSalesStore } from "@/store/sales.js";
+import { useStockStore } from "@/store/stock.js";
 import { useSearchStore } from "@/store/search.js";
 export default {
   data() {
@@ -158,19 +145,22 @@ export default {
     };
   },
   computed: {
-    ...mapStores(useProductStore, useSalesStore, useSearchStore),
+    ...mapStores(useProductStore, useStockStore, useSearchStore),
     categoryOptions() {
       let categories = [
         ...new Set(this.productStore.products.map((item) => item.category)),
       ];
       return categories;
     },
+    sortedProducts() {
+      return this.productStore.products.slice().sort((a, b) => {
+        return a.stock - b.stock;
+      });
+    },
     filteredItems() {
-      return this.productStore.products.filter((item) => {
-        const isActive = item.active;
+      return this.sortedProducts.filter((item) => {
         return (
-          isActive &&
-          (!this.filteredCategory || this.filteredCategory === item.category)
+          !this.filteredCategory || this.filteredCategory === item.category
         );
       });
     },
@@ -211,7 +201,6 @@ export default {
       }
     },
     showDetails(item) {
-      if (item.stock <= 0) return;
       this.selectedItem = item;
       this.quantity = 1;
       this.dialog = true;
@@ -250,12 +239,32 @@ export default {
     toggleCartDialog() {
       this.cartDialog = !this.cartDialog;
     },
+    removeStock(item) {
+      if (
+        confirm(`Remover ${this.quantity} unidades del producto: ${item.name}`)
+      ) {
+        let stockObject = {
+          items: [
+            {
+              id: item.id,
+              name: item.name,
+              description: item.description,
+              category: item.category,
+              price: item.price,
+              quantity: this.quantity,
+            },
+          ],
+        };
+        this.stockStore.stockRemove(stockObject);
+        this.closeProductDetails();
+        this.clearCart();
+      }
+    },
     checkout() {
       let saleObject = {
         items: [...this.cart],
-        checkoutPrice: this.checkoutPrice,
       };
-      this.salesStore.recordSale(saleObject);
+      this.stockStore.stockAdd(saleObject);
       this.clearCart();
     },
     clearCart() {
@@ -263,9 +272,7 @@ export default {
       this.cartDialog = false; // Close cart dialog when clearing cart
     },
     incrementQuantity() {
-      if (this.selectedItem.stock > this.quantity) {
-        this.quantity++;
-      }
+      this.quantity++;
     },
     decrementQuantity() {
       if (this.quantity > 1) {

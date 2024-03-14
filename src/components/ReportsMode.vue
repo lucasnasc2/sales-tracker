@@ -1,129 +1,247 @@
 <template>
-  <div class="px-3 pb-2">
-    <v-chip-group
-      :disabled="!salesStore.sales.length"
-      v-model="reportMode"
-      mandatory
-      column
-    >
-      <v-chip
-        color="primary"
-        filter
-        class="mx-1"
-        :value="report"
-        v-for="(report, index) in reports"
-        :key="index"
-        @click="changeReport(report)"
-      >
-        {{ report }}
-      </v-chip>
-    </v-chip-group>
-  </div>
-  <v-container fluid class="fill-height pt-0">
-    <v-row align="center" justify="center" class="fill-height">
-      <v-col v-if="salesStore.sales.length" cols="12">
-        <v-card variant="tonal" color="primary">
-          <v-card-title>Informe de ventas</v-card-title>
-          <v-card-subtitle
-            ><span v-if="salesStore.sales.length > 1">Desde: </span
-            >{{ tsToDate(salesStore.sales[0].checkoutTime) }}</v-card-subtitle
+  <v-tabs v-model="tab" fixed-tabs color="primary">
+    <v-tab :value="1">Ventas</v-tab>
+    <v-tab :value="2">Stock</v-tab>
+  </v-tabs>
+  <v-divider></v-divider>
+  <v-window v-model="tab">
+    <v-window-item :value="1">
+      <div class="pa-3">
+        <v-chip-group
+          :disabled="!salesStore.sales.length"
+          v-model="reportMode"
+          mandatory
+          column
+        >
+          <v-chip
+            color="primary"
+            filter
+            class="mx-1"
+            :value="report"
+            v-for="(report, index) in reports"
+            :key="index"
+            @click="changeReport(report)"
           >
-          <v-card-subtitle v-if="salesStore.sales.length > 1">
-            <span>Hasta: </span
-            >{{
-              tsToDate(
-                salesStore.sales[salesStore.sales.length - 1].checkoutTime
-              )
-            }}</v-card-subtitle
-          >
-          <v-divider></v-divider>
-          <v-card-text class="pa-0">
-            <v-list>
-              <v-list-item title="Total">
-                <template v-slot:append>
-                  {{ $globals.currency }}{{ totalProfit }}</template
-                >
-              </v-list-item>
-            </v-list>
-            <v-divider></v-divider>
-            <v-list v-if="reportMode == 'categorias'">
-              <v-list-item
-                v-for="(value, key) in totalItemsByCategory"
-                :key="key"
-                density="compact"
+            {{ report }}
+          </v-chip>
+        </v-chip-group>
+      </div>
+      <v-container fluid class="fill-height pt-0">
+        <v-row align="center" justify="center" class="fill-height">
+          <v-col v-if="salesStore.sales.length" cols="12">
+            <v-card variant="tonal" color="primary">
+              <v-card-title>Informe de ventas</v-card-title>
+              <v-card-subtitle
+                ><span v-if="salesStore.sales.length > 1">Desde: </span
+                >{{
+                  tsToDate(salesStore.sales[0].checkoutTime)
+                }}</v-card-subtitle
               >
-                <v-list-item-title>{{ key }}</v-list-item-title>
-
-                <template v-slot:append>
-                  x{{ value.totalQuantity }} => {{ $globals.currency
-                  }}{{ value.totalPrice }}</template
-                >
-              </v-list-item>
-            </v-list>
-            <v-list v-if="reportMode == 'productos'">
-              <v-list-item
-                v-for="(value, key) in totalItemsByProduct"
-                :key="key"
-                density="compact"
+              <v-card-subtitle v-if="salesStore.sales.length > 1">
+                <span>Hasta: </span
+                >{{
+                  tsToDate(
+                    salesStore.sales[salesStore.sales.length - 1].checkoutTime
+                  )
+                }}</v-card-subtitle
               >
-                <v-list-item-title>{{ value.name }}</v-list-item-title>
-
-                <template v-slot:append>
-                  x{{ value.totalQuantity }} => {{ $globals.currency
-                  }}{{ value.totalPrice }}</template
-                >
-              </v-list-item>
-            </v-list>
-            <v-list density="compact">
               <v-divider></v-divider>
-              <v-list-item
-                v-for="sale in sortedSalesByDate"
-                :key="sale.id"
-                :title="tsToDate(sale.checkoutTime)"
-                @click="selectSale(sale)"
+              <v-card-text class="pa-0">
+                <v-list>
+                  <v-list-item title="Total">
+                    <template v-slot:append>
+                      {{ $globals.currency }}{{ totalProfit }}</template
+                    >
+                  </v-list-item>
+                </v-list>
+                <v-divider></v-divider>
+                <v-list v-if="reportMode == 'categorias'">
+                  <v-list-item
+                    v-for="(value, key) in totalItemsByCategory"
+                    :key="key"
+                    density="compact"
+                  >
+                    <v-list-item-title>{{ key }}</v-list-item-title>
+
+                    <template v-slot:append>
+                      x{{ value.totalQuantity }} => {{ $globals.currency
+                      }}{{ value.totalPrice }}</template
+                    >
+                  </v-list-item>
+                </v-list>
+                <v-list v-if="reportMode == 'productos'">
+                  <v-list-item
+                    v-for="(value, key) in totalItemsByProduct"
+                    :key="key"
+                    density="compact"
+                  >
+                    <v-list-item-title>{{ value.name }}</v-list-item-title>
+
+                    <template v-slot:append>
+                      x{{ value.totalQuantity }} => {{ $globals.currency
+                      }}{{ value.totalPrice }}</template
+                    >
+                  </v-list-item>
+                </v-list>
+                <v-list density="compact">
+                  <v-divider></v-divider>
+                  <v-list-item
+                    v-for="sale in sortedSalesByDate"
+                    :key="sale.id"
+                    :title="tsToDate(sale.checkoutTime)"
+                    @click="selectSale(sale)"
+                  >
+                    <template v-slot:prepend>
+                      <v-avatar color="grey-lighten-1">
+                        <v-icon color="white">{{
+                          sale.canceled
+                            ? "mdi-arrow-u-left-top-bold"
+                            : "mdi-receipt-text"
+                        }}</v-icon>
+                      </v-avatar>
+                    </template>
+
+                    <template v-slot:append>
+                      {{ $globals.currency }}{{ sale.canceled ? 0 : sale.checkoutPrice }}
+                    </template>
+                  </v-list-item>
+                </v-list>
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <v-col v-else cols="12">
+            <v-card variant="tonal">
+              <v-card-title>Seleccione una fecha</v-card-title>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-window-item>
+    <v-window-item :value="2">
+      <v-container fluid class="fill-height">
+        <v-row align="center" justify="center" class="fill-height">
+          <v-col v-if="stockStore.stockRecord.length" cols="12">
+            <v-card variant="tonal" color="primary">
+              <v-card-title>Movimientos manuales de stock</v-card-title>
+              <v-card-subtitle
+                ><span v-if="stockStore.stockRecord.length > 1">Desde: </span
+                >{{
+                  tsToDate(stockStore.stockRecord[0].updateTime)
+                }}</v-card-subtitle
               >
-                <template v-slot:prepend>
-                  <v-avatar color="grey-lighten-1">
-                    <v-icon color="white">mdi-receipt-text</v-icon>
-                  </v-avatar>
-                </template>
+              <v-card-subtitle v-if="stockStore.stockRecord.length > 1">
+                <span>Hasta: </span
+                >{{
+                  tsToDate(
+                    stockStore.stockRecord[stockStore.stockRecord.length - 1]
+                      .updateTime
+                  )
+                }}</v-card-subtitle
+              >
+              <v-divider></v-divider>
+              <v-card-text class="pa-0">
+                <v-list density="compact">
+                  <v-list-item
+                    v-for="record in sortedRecordsByDate"
+                    :key="record.id"
+                    :title="tsToDate(record.updateTime)"
+                    @click="selectRecord(record)"
+                  >
+                    <template v-slot:prepend>
+                      <v-avatar color="grey-lighten-1">
+                        <v-icon color="white">{{
+                          record.transactionType == "stockAdd"
+                            ? "mdi-plus"
+                            : "mdi-minus"
+                        }}</v-icon>
+                      </v-avatar>
+                    </template>
 
-                <template v-slot:append>
-                  {{ $globals.currency }}{{ sale.checkoutPrice }}
-                </template>
-              </v-list-item>
-            </v-list>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col v-else cols="12">
-        <v-card variant="tonal">
-          <v-card-title>Seleccione una fecha</v-card-title>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
+                    <template v-slot:append>
+                      {{ record.transactionType == "stockAdd" ? "+" : "-"
+                      }}{{ sumStockRecordItems(record) }}
+                    </template>
+                  </v-list-item>
+                </v-list>
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <v-col v-else cols="12">
+            <v-card variant="tonal">
+              <v-card-title>Seleccione una fecha</v-card-title>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-window-item>
+  </v-window>
 
-  <v-dialog v-model="dialog" max-width="500px">
-    <v-card>
-      <v-card-title>Venta {{ selectedSale.id }}</v-card-title>
+  <v-dialog v-model="recordDetailDialog" max-width="500px">
+    <v-card v-if="recordDetailDialog">
+      <v-card-title
+        >{{ transactionType(selectedRecord.transactionType) }}
+      </v-card-title>
+      <v-card-subtitle>
+        {{ selectedRecord.id }}
+      </v-card-subtitle>
+      <v-card-subtitle>{{
+        tsToDate(selectedRecord.updateTime)
+      }}</v-card-subtitle>
+      <v-card-subtitle>{{ selectedRecord.userId }}</v-card-subtitle>
+      <v-card-text class="px-0">
+        <v-list>
+          <v-list-item>
+            <v-list-item-title>Total</v-list-item-title>
+            <template v-slot:append>
+              {{ selectedRecord.transactionType == "stockAdd" ? "+" : "-"
+              }}{{ sumStockRecordItems(selectedRecord) }}
+            </template>
+          </v-list-item>
+        </v-list>
+
+        <v-divider></v-divider>
+        <v-list lines="two">
+          <v-list-subheader>Productos</v-list-subheader>
+
+          <v-list-item
+            v-for="item in selectedRecord.items"
+            :key="item.id"
+            :subtitle="item.description"
+            :title="item.name"
+          >
+            <v-list-item-subtitle>{{ item.category }}</v-list-item-subtitle>
+
+            <template v-slot:append
+              >{{ selectedRecord.transactionType == "stockAdd" ? "+" : "-"
+              }}{{ item.quantity }}
+            </template>
+          </v-list-item>
+        </v-list>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog v-model="detailDialog" max-width="500px">
+    <v-card v-if="detailDialog">
+      <v-card-title
+        >{{ transactionType(selectedSale.transactionType) }}
+      </v-card-title>
+      <v-card-subtitle>
+        {{ selectedSale.id }}
+      </v-card-subtitle>
       <v-card-subtitle>{{
         tsToDate(selectedSale.checkoutTime)
       }}</v-card-subtitle>
       <v-card-subtitle>{{ selectedSale.userId }}</v-card-subtitle>
       <v-card-text class="px-0">
-        <div class="d-flex py-0 justify-space-between">
-          <v-list-item density="compact">
+        <v-list>
+          <v-list-item>
             <v-list-item-title>Total</v-list-item-title>
+            <template v-slot:append>
+              {{ $globals.currency }}{{ selectedSale.checkoutPrice }}
+            </template>
           </v-list-item>
-
-          <v-list-item density="compact">
-            <v-list-item-title
-              >{{ $globals.currency
-              }}{{ selectedSale.checkoutPrice }}</v-list-item-title
-            >
-          </v-list-item>
-        </div>
+        </v-list>
 
         <v-divider></v-divider>
         <v-list lines="two">
@@ -144,6 +262,12 @@
           </v-list-item>
         </v-list>
       </v-card-text>
+      <v-card-actions v-if="selectedSale.transactionType == 'sale'">
+        <v-spacer></v-spacer>
+        <v-btn color="primary" @click="returnProducts(selectedSale)"
+          >Devolver productos</v-btn
+        >
+      </v-card-actions>
     </v-card>
   </v-dialog>
 
@@ -186,6 +310,7 @@
 import { mapStores } from "pinia";
 import { useProductStore } from "@/store/products.js";
 import { useSalesStore } from "@/store/sales.js";
+import { useStockStore } from "@/store/stock.js";
 import { useAlertStore } from "@/store/alerts";
 import { useLoaderStore } from "@/store/loader.js";
 import { generateExcelSales } from "@/plugins/getExcel.js";
@@ -200,6 +325,7 @@ export default {
       selectedDate: todaysDate,
       dates: [],
       dateRange: [],
+      tab: 1,
       selectedSale: {
         checkoutPrice: 0,
         userId: "",
@@ -207,16 +333,36 @@ export default {
         id: "",
         items: [],
       },
-      dialog: false,
+      selectedRecord: {
+        userId: "",
+        updateTime: "",
+        id: "",
+        items: [],
+      },
+      detailDialog: false,
       reports: ["productos", "categorias"],
       reportMode: "productos",
       showDatePicker: false, // Initialize with an empty array
+      recordDetailDialog: false,
     };
   },
   computed: {
-    ...mapStores(useProductStore, useSalesStore, useAlertStore, useLoaderStore),
+    ...mapStores(
+      useProductStore,
+      useSalesStore,
+      useStockStore,
+      useAlertStore,
+      useLoaderStore
+    ),
     formattedSelectedDate() {
       return new Date(this.selectedDate).toLocaleDateString();
+    },
+    sortedRecordsByDate() {
+      return this.stockStore.stockRecord.slice().sort((a, b) => {
+        return (
+          new Date(b.updateTime.toMillis()) - new Date(a.updateTime.toMillis())
+        );
+      });
     },
     sortedSalesByDate() {
       return this.salesStore.sales.slice().sort((a, b) => {
@@ -274,8 +420,19 @@ export default {
     saleIsSelected() {
       return !!selectedSale;
     },
+    transactionType() {
+      return function (type) {
+        if (type == "sale") return "venta";
+        if (type == "returned") return "devolución";
+      };
+    },
     todaysDateString() {
       return todaysDate.toDateString();
+    },
+    returnPrice() {
+      return this.returnCart.items.reduce((total, item) => {
+        return total + item.price * item.quantity;
+      }, 0);
     },
   },
   watch: {
@@ -297,6 +454,7 @@ export default {
   },
   mounted() {
     this.salesStore.fetchSales(todaysDate, tomorrow);
+    this.stockStore.fetchStockRecord(todaysDate, tomorrow);
   },
   methods: {
     tsToDate(timestamp) {
@@ -304,6 +462,17 @@ export default {
       // Create a new JavaScript Date object using the milliseconds
       const convertedDate = new Date(milliseconds).toLocaleString();
       return convertedDate;
+    },
+    sumStockRecordItems(record) {
+      let sum = 0;
+      if (record && record.items && Array.isArray(record.items)) {
+        record.items.forEach((item) => {
+          if (item.quantity) {
+            sum += item.quantity;
+          }
+        });
+      }
+      return sum;
     },
     fetchSalesReport() {
       let startDate = new Date(this.dateRange[0]);
@@ -317,14 +486,19 @@ export default {
       this.salesStore.cancelSubsctription();
 
       this.salesStore.fetchSales(startDate, endDate);
+      this.stockStore.fetchStockRecord(startDate, endDate);
 
       this.dates = [];
       this.dateRange = [];
       this.showDatePicker = false;
     },
+    selectRecord(record) {
+      this.selectedRecord = { ...record };
+      this.recordDetailDialog = true;
+    },
     selectSale(sale) {
       this.selectedSale = { ...sale };
-      this.dialog = true;
+      this.detailDialog = true;
     },
     chengeDate(v) {
       this.selectedDate = v;
@@ -332,6 +506,12 @@ export default {
     },
     changeReport(mode) {
       this.reportMode = mode;
+    },
+    returnProducts(sale) {
+      if (confirm("Desea cancelar el ticket para hacer una devolución?")) {
+        this.salesStore.recordReturned(sale, sale.id);
+        this.detailDialog = false;
+      }
     },
     findMissingDate(sortedArray1, sortedArray2) {
       // Iterate through both arrays simultaneously
@@ -384,7 +564,10 @@ export default {
         if (confirm("Descargar informe en formato .xlsx?")) {
           this.loaderStore.state = true;
           // Assuming salesData and productsData are available in your component
-          const excelBlob = await generateExcelSales(this.salesStore.sales);
+          const excelBlob = await generateExcelSales(
+            this.salesStore.sales,
+            this.stockStore.stockRecord
+          );
           const url = window.URL.createObjectURL(excelBlob);
           const link = document.createElement("a");
           link.href = url;

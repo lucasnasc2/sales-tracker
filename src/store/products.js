@@ -15,7 +15,7 @@ import {
 import firebaseApp from "../firebase.js";
 const db = getFirestore(firebaseApp);
 if (import.meta.env.DEV) {
-  connectFirestoreEmulator(db, "127.0.0.1", 8080);
+  connectFirestoreEmulator(db, "127.0.0.1", 8081);
 }
 
 // You can name the return value of `defineStore()` anything you want,
@@ -28,7 +28,7 @@ export const useProductStore = defineStore("product", {
   //   userLoggedIn: (state) => !!state.user,
   // },
   actions: {
-    cancelSubsctription() {
+    cancelSubscription() {
       if (this.productsSubscription) {
         this.productsSubscription();
         this.productsSubscription = null;
@@ -62,7 +62,7 @@ export const useProductStore = defineStore("product", {
           createdTimestamp: product.createdTimestamp,
           modifiedBy: userStore.user.email,
           modifiedTimestamp: serverTimestamp(),
-        }
+        };
         const productRef = doc(db, "products", product.id);
         await setDoc(productRef, { ...productObject }, { merge: true });
         console.log("document updated");

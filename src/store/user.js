@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { useProductStore } from "./products.js";
 import { useSalesStore } from "./sales.js";
+import { useStockStore } from "./stock.js";
 import { useAlertStore } from "./alerts.js";
 import {
   getAuth,
@@ -11,6 +12,7 @@ import {
 } from "firebase/auth";
 import firebaseApp from "../firebase.js";
 import router from "@/router/index.js";
+
 const auth = getAuth(firebaseApp);
 if (import.meta.env.DEV) {
   connectAuthEmulator(auth, "http://127.0.0.1:9099");
@@ -61,9 +63,11 @@ export const useUserStore = defineStore("user", {
       const alertStore = useAlertStore();
       const productStore = useProductStore();
       const salesStore = useSalesStore();
+      const stockStore = useStockStore();
 
-        productStore.cancelSubsctription();
-        salesStore.cancelSubsctription();
+        productStore.cancelSubscription();
+        salesStore.cancelSubscription();
+        stockStore.cancelSubscription();
         
       signOut(auth)
         .then(() => {

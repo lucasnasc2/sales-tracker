@@ -42,6 +42,12 @@
         <v-list-item-title>Gestionar</v-list-item-title>
       </v-list-item>
       <v-list-item
+        :active="modeStore.mode == 'stock'"
+        v-on:click="modeStore.changeMode('stock')"
+      >
+        <v-list-item-title>Stock</v-list-item-title>
+      </v-list-item>
+      <v-list-item
         :active="modeStore.mode == 'reports'"
         v-on:click="modeStore.changeMode('reports')"
       >
@@ -56,10 +62,10 @@
       </div>
     </template>
   </v-navigation-drawer>
-  <div class="text-overline px-4 mt-2">{{ modeStore.mode }}</div>
   <v-main class="custom-main">
     <SellerMode v-if="modeStore.mode == 'seller'" />
     <ManageMode v-if="modeStore.mode == 'manage'" />
+    <StockMode v-if="modeStore.mode == 'stock'" />
     <ReportsMode v-if="modeStore.mode == 'reports'" />
   </v-main>
 </template>

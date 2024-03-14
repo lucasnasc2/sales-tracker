@@ -22,35 +22,35 @@ if (import.meta.env.DEV) {
   connectFirestoreEmulator(db, "127.0.0.1", 8081);
 }
 
-export const useSalesStore = defineStore("sales", {
-  state: () => ({ sales: [], salesReport: [], salesSubscription: null }),
+export const useStockStore = defineStore("stock", {
+  state: () => ({ stockRecord: [], stockSubscription: null }),
   actions: {
     cancelSubscription() {
-      if (this.salesSubscription) {
-        this.salesSubscription();
-        this.salesSubscription = null;
+      if (this.stockSubscription) {
+        this.stockSubscription();
+        this.stockSubscription = null;
       }
     },
-    async recordSale(sale) {
+    async stockRemove(stockItems) {
       const userStore = useUserStore();
       const alertStore = useAlertStore();
       const batch = writeBatch(db); // Initialize a Firestore batch
 
       try {
-        let saleObject = {
-          ...sale,
+        let stockObject = {
+          ...stockItems,
           userId: userStore.user.email,
-          checkoutTime: serverTimestamp(),
-          transactionType: "sale",
+          updateTime: serverTimestamp(),
+          transactionType: "stockRemove",
         };
         // Create a reference for the new sale document
-        const saleRef = doc(collection(db, "sales"));
+        const docRef = doc(collection(db, "stockRecord"));
 
         // Add sale creation operation to the batch
-        batch.set(saleRef, saleObject);
+        batch.set(docRef, stockObject);
 
         // Update stock for each item in the sale
-        for (const item of sale.items) {
+        for (const item of stockObject.items) {
           const productRef = doc(db, "products", item.id);
           const productDoc = await getDoc(productRef);
           if (productDoc.exists()) {
@@ -70,31 +70,30 @@ export const useSalesStore = defineStore("sales", {
 
         await batch.commit(); // Commit the batched writes
       } catch (error) {
-        // Rollback changes in case of an error
-        console.log("Error adding sale:", error);
+        console.log(error);
         alertStore.setAlert(error.message, "error", 8);
-        return; // Exit the function early to prevent further execution
       }
     },
-    async recordReturned(returned,saleId) {
-      console.log(saleId);
+    async stockAdd(stockItems) {
       const userStore = useUserStore();
       const alertStore = useAlertStore();
       const batch = writeBatch(db); // Initialize a Firestore batch
 
       try {
+        let stockObject = {
+          ...stockItems,
+          userId: userStore.user.email,
+          updateTime: serverTimestamp(),
+          transactionType: "stockAdd",
+        };
+        // Create a reference for the new sale document
+        const docRef = doc(collection(db, "stockRecord"));
 
-        const originalSaleRef = doc(db, "sales", saleId);
-        const originalSaleDoc = await getDoc(originalSaleRef);
-
-        if (originalSaleDoc.exists()) {
-          batch.update(originalSaleRef, { canceled: userStore.user.email });
-        } else {
-          throw new Error(`Sale with ID ${saleId} does not exist.`);
-        }
+        // Add sale creation operation to the batch
+        batch.set(docRef, stockObject);
 
         // Update stock for each item in the sale
-        for (const item of returned.items) {
+        for (const item of stockObject.items) {
           const productRef = doc(db, "products", item.id);
           const productDoc = await getDoc(productRef);
           if (productDoc.exists()) {
@@ -110,34 +109,33 @@ export const useSalesStore = defineStore("sales", {
       } catch (error) {
         console.log(error);
         alertStore.setAlert(error.message, "error", 8);
-        return; // Exit the function early to prevent further execution
       }
     },
-    async fetchSales(startDate, endDate) {
-      if (!!this.salesSubscription) return;
+    async fetchStockRecord(startDate, endDate) {
+      if (!!this.stockSubscription) return;
       console.log(startDate, endDate);
       const q = query(
-        collection(db, "sales"),
-        where("checkoutTime", ">=", startDate),
-        where("checkoutTime", "<", endDate)
+        collection(db, "stockRecord"),
+        where("updateTime", ">=", startDate),
+        where("updateTime", "<", endDate)
       );
 
       // Subscribe to snapshot changes
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const sales = [];
+        const stockRecord = [];
         querySnapshot.forEach((doc) => {
           console.log(doc.id);
-          let sale = {
+          let record = {
             id: doc.id,
             ...doc.data(),
           };
-          sales.push(sale);
+          stockRecord.push(record);
         });
-        this.sales = sales;
-        console.log(this.sales);
+        this.stockRecord = stockRecord;
+        console.log(this.stockRecord);
       });
 
-      this.salesSubscription = unsubscribe;
+      this.stockSubscription = unsubscribe;
     },
   },
 });
