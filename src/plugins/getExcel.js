@@ -20,6 +20,7 @@ async function generateExcelSales(salesData) {
     "User ID",
     "Checkout Time",
     "Checkout Price",
+    "Donation",
     "Checkout ID",
   ]);
 
@@ -36,6 +37,7 @@ async function generateExcelSales(salesData) {
         sale.userId,
         checkoutTime,
         sale.checkoutPrice,
+        sale.donation ? sale.donation : 0,
         sale.id,
       ]);
     });

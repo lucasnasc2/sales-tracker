@@ -5,7 +5,7 @@
     </template>
     <template v-slot:append>
       <v-btn
-								v-if=" modeStore.mode != 'reports' "
+								v-if=" modeStore.mode != 'reports' && modeStore.mode != 'search' "
         class="searchBtn"
         :icon="searchStore.state ? 'mdi-close' : 'mdi-magnify'"
         @click="
@@ -13,12 +13,12 @@
         "
       ></v-btn>
     </template>
-    <v-app-bar-title v-if="!searchStore.state || modeStore.mode == 'reports'">
+    <v-app-bar-title v-if="!searchStore.state || modeStore.mode == 'reports' || modeStore.mode == 'search'">
       {{ $globals.organizationName }}
     </v-app-bar-title>
     <v-text-field
       v-model="searchStore.text"
-      v-if="searchStore.state && modeStore.mode != 'reports' "
+      v-if="searchStore.state && (modeStore.mode != 'reports' || modeStore.mode != 'search')"
       hide-details
       single-line
       autofocus
@@ -47,6 +47,12 @@
       >
         <v-list-item-title>Informes</v-list-item-title>
       </v-list-item>
+      <v-list-item
+        :active="modeStore.mode == 'search'"
+        v-on:click="modeStore.changeMode('search')"
+      >
+        <v-list-item-title>Buscar</v-list-item-title>
+      </v-list-item>
     </v-list>
     <template v-slot:append>
       <div class="pa-2">
@@ -61,6 +67,7 @@
     <SellerMode v-if="modeStore.mode == 'seller'" />
     <ManageMode v-if="modeStore.mode == 'manage'" />
     <ReportsMode v-if="modeStore.mode == 'reports'" />
+    <SearchMode v-if="modeStore.mode == 'search'" />
   </v-main>
 </template>
 

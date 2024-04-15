@@ -2,33 +2,21 @@
   <v-container class="pa-0">
     <!-- Chips for filtering -->
     <div class="px-2">
-      <CategoryFilter
-        :items="categoryOptions"
-        @selected="toggleFilterByCategory"
-      ></CategoryFilter>
+      <CategoryFilter :items="categoryOptions" @selected="toggleFilterByCategory"></CategoryFilter>
     </div>
 
     <!-- Grid of square cards -->
-    <ProductGrid
-      :items="searchedItems"
-      :categories="categoryOptions"
-      @selected="showDetails"
-    ></ProductGrid>
+    <ProductGrid :items="searchedItems" :categories="categoryOptions" @selected="showDetails"></ProductGrid>
 
     <!-- Popup dialog for product details -->
     <v-dialog v-model="dialog" max-width="500">
       <v-card>
         <v-list lines="two">
-          <v-list-item
-            density="compact"
-            :subtitle="selectedItem.description"
-            :title="selectedItem.name"
-          >
+          <v-list-item density="compact" :subtitle="selectedItem.description" :title="selectedItem.name">
             <v-list-item-subtitle>{{
               selectedItem.category
             }}</v-list-item-subtitle>
-            <template v-slot:append
-              >{{ quantity }}x {{ $globals.currency
+            <template v-slot:append>{{ quantity }}x {{ $globals.currency
               }}{{ selectedItem.price * quantity }}
             </template>
           </v-list-item>
@@ -43,16 +31,15 @@
               </v-btn>
             </v-col>
             <v-col class="text-center" cols="4">
-              <div
-                style="
+              <div style="
                   display: flex;
                   align-items: center;
                   justify-content: center;
                   height: 100%;
                   width: 100%;
-                "
-              >
-                <v-text-field v-model="quantity" number></v-text-field>
+                ">
+                <v-text-field v-model="quantity" type="number" hide-details single-line
+                  density="compact"></v-text-field>
               </div>
             </v-col>
             <v-col class="text-center" cols="4">
@@ -63,13 +50,11 @@
           </v-row>
           <v-spacer></v-spacer>
         </v-card-actions>
-
+        <v-divider></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn @click="closeProductDetails">Close</v-btn>
-          <v-btn color="primary" @click="addItemToCart(selectedItem)"
-            >Add to Cart</v-btn
-          >
+          <v-btn color="primary" @click="addItemToCart(selectedItem)">Add to Cart</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -78,32 +63,50 @@
     <v-dialog v-model="cartDialog" max-width="600">
       <v-card>
         <v-card-title>Cart</v-card-title>
-        <v-card-actions>
+        <v-divider></v-divider>
+        <v-list-item density="compact">
+          <v-list-item-title>Total</v-list-item-title>
+
+          <template v-slot:append>
+            {{ checkoutPrice }}
+          </template>
+        </v-list-item>
+        <v-divider></v-divider>
+        <v-list-item density="compact">
+          <v-list-item-title>Con donación?</v-list-item-title>
+
+          <template v-slot:append>
+
+            <v-switch color="primary" density="compact" hide-details v-model="donation"></v-switch>
+          </template>
+        </v-list-item>
+        <v-list-item v-if="donation" :disabled="!donation" density="compact">
+          <v-list-item-title>Valor pagado</v-list-item-title>
+
+          <template v-slot:append>
+
+            <v-text-field style="max-width: 90px;" class="align-right" v-model="paidValue" autofocus hide-details single-line
+              density="compact" type="number">
+              <template v-slot:append-inner>
+                {{ $globals.currency }}
+              </template>
+            </v-text-field>
+          </template>
+        </v-list-item>
+        <v-divider></v-divider>
+        <v-card-actions class="pb-0">
           <v-btn color="primary" @click="clearCart">Clear Cart</v-btn>
           <v-spacer></v-spacer>
           <v-btn color="primary" @click="checkout">Checkout</v-btn>
         </v-card-actions>
-        <v-list>
-          <v-list-item>
-            <v-list-item-title>Total</v-list-item-title>
+        <v-divider></v-divider>
+        <v-list class="py-0">
 
-            <template v-slot:append>
-              {{ checkoutPrice }}
-            </template>
-          </v-list-item>
-          <v-divider></v-divider>
-          <v-list-item
-            density="compact"
-            class="pa-2"
-            v-for="(cartItem, index) in cart"
-            :key="index"
-          >
+
+          <v-list-item density="compact" class="pr-1" v-for="(cartItem, index) in cart" :key="index">
             <v-list-item-title>{{
               getProductById(cartItem.id).name
             }}</v-list-item-title>
-            <v-list-item-subtitle>{{
-              getProductById(cartItem.id).description
-            }}</v-list-item-subtitle>
             <v-list-item-subtitle>{{
               getProductById(cartItem.id).category
             }}</v-list-item-subtitle>
@@ -112,7 +115,7 @@
               {{ cartItem.quantity }} x {{ $globals.currency
               }}{{ cartItem.price }} = {{ $globals.currency
               }}{{ cartItem.quantity * cartItem.price }}
-              <v-btn flat icon="mdi-delete" @click="removeItemFromCart(index)">
+              <v-btn flat icon="mdi-close" @click="removeItemFromCart(index)">
               </v-btn>
             </template>
           </v-list-item>
@@ -124,27 +127,19 @@
   <!-- Fixed button with cart icon -->
 
   <div style="position: fixed; bottom: 20px; right: 20px">
-    <v-btn
-      icon
-      size="x-large"
-      color="primary"
-      @click="toggleCartDialog"
-      :disabled="cart.length === 0"
-    >
+    <v-btn icon size="x-large" color="primary" @click="toggleCartDialog" :disabled="cart.length === 0">
       <v-icon>mdi-cart</v-icon>
-      <v-badge
-        v-if="cart.length >= 1"
-        :content="totalQuantityInCart"
-        overlap
-      ></v-badge>
+      <v-badge v-if="cart.length >= 1" :content="totalQuantityInCart" overlap></v-badge>
     </v-btn>
   </div>
+  <div style="height: 80px"></div>
 </template>
 
 <script>
 import { mapStores } from "pinia";
 import { useProductStore } from "@/store/products.js";
 import { useSalesStore } from "@/store/sales.js";
+import { useAlertStore } from "@/store/alerts";
 import { useSearchStore } from "@/store/search.js";
 export default {
   data() {
@@ -155,10 +150,12 @@ export default {
       cartDialog: false,
       cart: [], // Array to store items in the cart
       quantity: 1, // Default quantity,
+      paidValue: null,
+      donation: false,
     };
   },
   computed: {
-    ...mapStores(useProductStore, useSalesStore, useSearchStore),
+    ...mapStores(useProductStore, useAlertStore, useSalesStore, useSearchStore),
     categoryOptions() {
       let categories = [
         ...new Set(this.productStore.products.map((item) => item.category)),
@@ -166,11 +163,11 @@ export default {
       return categories;
     },
     filteredItems() {
-    return this.productStore.products.filter((item) => {
-      const isActive = item.active;
-      return isActive && (!this.filteredCategory || this.filteredCategory === item.category);
-    });
-  },
+      return this.productStore.products.filter((item) => {
+        const isActive = item.active;
+        return isActive && (!this.filteredCategory || this.filteredCategory === item.category);
+      });
+    },
     searchedItems() {
       let text = this.searchStore.text.toLowerCase()
       return this.filteredItems.filter((item) =>
@@ -191,7 +188,8 @@ export default {
   mounted() {
     this.productStore.fetchProducts();
   },
-  watch: {},
+  watch: {
+  },
   methods: {
     getProductById(id) {
       const index = this.productStore.products.findIndex(
@@ -249,15 +247,34 @@ export default {
       this.cartDialog = !this.cartDialog;
     },
     checkout() {
-      let saleObject = {
-        items: [...this.cart],
-        checkoutPrice: this.checkoutPrice,
-      };
-      this.salesStore.addToFirestore(saleObject);
-      this.clearCart();
+      if (this.donation) {
+        if (this.paidValue >= this.checkoutPrice) {
+          let saleObject = {
+            items: [...this.cart],
+            checkoutPrice: this.checkoutPrice,
+            donation: this.donation ? this.paidValue - this.checkoutPrice : 0
+          };
+          this.salesStore.addToFirestore(saleObject);
+          this.clearCart();
+        } else {
+          this.alertStore.setAlert("Error donación. Valor a pagar debe ser mayor que el total", "error", 7);
+        }
+      } else {
+        let saleObject = {
+          items: [...this.cart],
+          checkoutPrice: this.checkoutPrice,
+          donation: 0
+        };
+        this.salesStore.addToFirestore(saleObject);
+        this.clearCart();
+      }
+
+
     },
     clearCart() {
       this.cart = [];
+      this.paidValue = 0;
+      this.donation = false;
       this.cartDialog = false; // Close cart dialog when clearing cart
     },
     incrementQuantity() {

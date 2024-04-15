@@ -10,10 +10,11 @@ import {
   signOut,
 } from "firebase/auth";
 import firebaseApp from "../firebase.js";
+import firebaseJSON from "../../firebase.json";
 import router from "@/router/index.js";
 const auth = getAuth(firebaseApp);
 if (import.meta.env.DEV) {
-  connectAuthEmulator(auth, "http://127.0.0.1:9099");
+  connectAuthEmulator(auth, `http://127.0.0.1:${firebaseJSON.emulators.auth.port}`);
 }
 
 // You can name the return value of `defineStore()` anything you want,

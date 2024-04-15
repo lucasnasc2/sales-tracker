@@ -69,3 +69,4 @@ node_modules/
 
 dist/*
 dev-dist/*
+emulators-data/

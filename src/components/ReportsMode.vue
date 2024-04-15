@@ -39,14 +39,19 @@
           <v-divider></v-divider>
           <v-card-text class="pa-0">
             <v-list>
-              <v-list-item title="Total">
+              <v-list-item density="compact" title="Total">
                 <template v-slot:append>
                   {{ $globals.currency }}{{ totalProfit }}</template
                 >
               </v-list-item>
+              <v-list-item density="compact" title="Donaciones">
+                <template v-slot:append>
+                  {{ $globals.currency }}{{ totalDonations }}</template
+                >
+              </v-list-item>
             </v-list>
             <v-divider></v-divider>
-            <v-list v-if="reportMode == 'categorias'">
+            <v-list density="compact" v-if="reportMode == 'categorias'">
               <v-list-item
                 v-for="(value, key) in totalItemsByCategory"
                 :key="key"
@@ -60,7 +65,7 @@
                 >
               </v-list-item>
             </v-list>
-            <v-list v-if="reportMode == 'productos'">
+            <v-list density="compact" v-if="reportMode == 'productos'">
               <v-list-item
                 v-for="(value, key) in totalItemsByProduct"
                 :key="key"
@@ -74,17 +79,18 @@
                 >
               </v-list-item>
             </v-list>
-            <v-list density="compact">
-              <v-divider></v-divider>
+            <v-list density="compact" v-if="reportMode == 'tickets'">
               <v-list-item
                 v-for="sale in sortedSalesByDate"
                 :key="sale.id"
                 :title="tsToDate(sale.checkoutTime)"
+                :subtitle="sale.userId"
                 @click="selectSale(sale)"
+                density="compact"
               >
                 <template v-slot:prepend>
-                  <v-avatar color="grey-lighten-1">
-                    <v-icon color="white">mdi-receipt-text</v-icon>
+                  <v-avatar size="small" density="compact" :color="sale.donation ? 'primary':'grey-lighten-1'">
+                    <v-icon size="small" color="white">mdi-receipt-text</v-icon>
                   </v-avatar>
                 </template>
 
@@ -125,15 +131,25 @@
           </v-list-item>
         </div>
 
-        <v-divider></v-divider>
-        <v-list lines="two">
-          <v-list-subheader>Productos</v-list-subheader>
+        <div v-if="selectedSale.donation" class="d-flex py-0 justify-space-between">
+          <v-list-item density="compact">
+            <v-list-item-title>Donación</v-list-item-title>
+          </v-list-item>
 
+          <v-list-item density="compact">
+            <v-list-item-title
+              >{{ $globals.currency
+              }}{{ selectedSale.donation }}</v-list-item-title
+            >
+          </v-list-item>
+        </div>
+        <v-divider></v-divider>
+        <v-list>
           <v-list-item
             v-for="item in selectedSale.items"
             :key="item.id"
-            :subtitle="item.description"
             :title="item.name"
+            density="compact"
           >
             <v-list-item-subtitle>{{ item.category }}</v-list-item-subtitle>
 
@@ -180,6 +196,7 @@
       @click="downloadExcel"
     ></v-btn>
   </div>
+  <div style="height: 80px"></div>
 </template>
 
 <script>
@@ -208,8 +225,8 @@ export default {
         items: [],
       },
       dialog: false,
-      reports: ["productos", "categorias"],
-      reportMode: "productos",
+      reports: ["tickets","productos", "categorias"],
+      reportMode: "tickets",
       showDatePicker: false, // Initialize with an empty array
     };
   },
@@ -268,6 +285,15 @@ export default {
       let total = 0;
       for (const sale of this.salesStore.sales) {
         total += sale.checkoutPrice;
+      }
+      return total;
+    },
+    totalDonations() {
+      let total = 0;
+      for (const sale of this.salesStore.sales) {
+        if(sale.donation){
+          total += sale.donation;
+        }
       }
       return total;
     },

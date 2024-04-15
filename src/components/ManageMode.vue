@@ -27,13 +27,11 @@
             <v-text-field v-model="editedItem.category" label="Category" @input="checkFieldsFilled"></v-text-field>
             <v-text-field v-model="editedItem.price" label="Price" @input="checkFieldsFilled"></v-text-field>
           </v-form>
-          <v-list>
-            <v-list-item title="Activo">
+          <v-list-item density="compact" title="Activo">
               <template v-slot:append>
-                <v-switch color="primary" density="compact" inset hide-details v-model="editedItem.active"></v-switch></template
+                <v-switch color="primary" density="compact" hide-details v-model="editedItem.active"></v-switch></template
               >
             </v-list-item>
-          </v-list>
         </v-card-text>
         <v-card-actions>
           <v-btn v-if="isEditing" @click="confirmDelete">Borrar</v-btn>
@@ -60,6 +58,7 @@
       @click="downloadExcel"
     ></v-btn>
   </div>
+  <div style="height: 80px"></div>
 </template>
 
 <script>

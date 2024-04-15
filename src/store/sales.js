@@ -11,13 +11,15 @@ import {
   where,
   doc,
   getDocs,
+  getDoc,
   deleteDoc,
   serverTimestamp,
 } from "firebase/firestore";
 import firebaseApp from "../firebase.js";
+import firebaseJSON from "../../firebase.json";
 const db = getFirestore(firebaseApp);
 if (import.meta.env.DEV) {
-  connectFirestoreEmulator(db, "127.0.0.1", 8080);
+  connectFirestoreEmulator(db, "127.0.0.1", firebaseJSON.emulators.firestore.port);
 }
 
 
@@ -32,7 +34,7 @@ export const useSalesStore = defineStore("sales", {
   // },
   actions: {
     cancelSubsctription() {
-      if(this.salesSubscription) {
+      if (this.salesSubscription) {
         this.salesSubscription()
         this.salesSubscription = null
       }
@@ -97,8 +99,8 @@ export const useSalesStore = defineStore("sales", {
       this.salesSubscription = unsubscribe
     },
     async fetchSalesReport(startDate, endDate) {
-      console.log("start",startDate);
-      console.log("end" ,endDate);
+      console.log("start", startDate);
+      console.log("end", endDate);
       const q = query(
         collection(db, "sales"),
         where("checkoutTime", ">=", startDate),
@@ -117,5 +119,19 @@ export const useSalesStore = defineStore("sales", {
       this.salesReport = salesReport; // Update store state with fetched products
       console.log(this.salesReport);
     },
+    async searchSaleById(searchId) {
+      console.log("searchId", searchId);
+      const docRef = doc(db, "sales", searchId);
+      const docSnap = await getDoc(docRef);
+
+      return new Promise((resolve, reject) => {
+        if (docSnap.exists()) {
+          resolve(docSnap.data());
+        } else {
+          // If the document doesn't exist, resolve with null
+          resolve(null);
+        }
+      });
+    }
   },
 });

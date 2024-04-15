@@ -13,9 +13,10 @@ import {
   serverTimestamp
 } from "firebase/firestore";
 import firebaseApp from "../firebase.js";
+import firebaseJSON from "../../firebase.json";
 const db = getFirestore(firebaseApp);
 if (import.meta.env.DEV) {
-  connectFirestoreEmulator(db, "127.0.0.1", 8080);
+  connectFirestoreEmulator(db, "127.0.0.1", firebaseJSON.emulators.firestore.port);
 }
 
 // You can name the return value of `defineStore()` anything you want,

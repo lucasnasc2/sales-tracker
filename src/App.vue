@@ -30,4 +30,12 @@ export default {
 .fade-enter, .fade-leave-to {
   opacity: 0;
 }
+.align-right .v-input__control input {
+  text-align: right;
+}
+.firebase-emulator-warning {
+  background-color: transparent !important;
+  border: none !important;
+  color: rgba(245, 66, 66, 0.3) !important;
+}
 </style>
